@@ -1,0 +1,136 @@
+using System;
+using UnityEngine;
+
+namespace PlayerManager
+{
+    #region Enums
+    public enum Element
+    {
+        None,
+        Wind,
+        Water,
+        Fire
+    }
+
+    enum AttackType 
+    { 
+        Melee, 
+        Ranged
+    }
+    #endregion
+
+    [RequireComponent(typeof(Rigidbody2D))]
+    [RequireComponent(typeof(InputEvents))]
+    public class PlayerContext : MonoBehaviour
+    {
+        #region Variables
+        // References
+        private InputEvents inputs;
+        private Rigidbody2D rb;
+
+        [Header("-- STATS --")]
+        [SerializeField][Range(0, 100)] int currentHealth = 100;
+        [SerializeField] int maxHealth = 100;
+
+        [Space(20)]
+
+        [Header("-- MOVEMENT --")]
+        [Header("Settings")]
+        [SerializeField][Range(1, 10)] int walkSpeed = 3;
+        [SerializeField][Range(1, 5)] int jumpForce = 4;
+
+        [Header("Gameplay Info")]
+        [SerializeField] bool canWalk = true;
+        [SerializeField] bool canJump = true;
+        [SerializeField] bool isGrounded = false;
+
+        [Header("Input Info")]
+        [SerializeField] float walkInput = 0;
+        [SerializeField] bool jumpInput = false;
+
+        [Space(20)]
+
+        [Header("-- COMBAT --")]
+        [Header("Settings")]
+        [SerializeField] int meleeDamage = 15;
+        [SerializeField] int rangedDamage = 10;
+
+        [Header("Gameplay Info")]
+        [SerializeField] bool canAttack = true;
+        [EnumButtons] [SerializeField] Element[] usableElements = { };
+        [EnumButtons] [SerializeField] Element selectedElement = Element.None;
+
+        [Header("Input Info")]
+        [SerializeField] bool meleeInput = false;
+        [SerializeField] bool rangedInput = false;
+        #endregion
+
+        #region Properties
+        // References
+        public InputEvents Inputs { get { return inputs; } }
+        public Rigidbody2D Rigidbody { get { return rb; } }
+
+        // Stats
+        public int CurrentHealth 
+        { 
+            get { return currentHealth; }
+            set 
+            { 
+                if (value < 0) value = 0; 
+                else if (value > MaxHealth) value = 100;
+                else currentHealth = value; 
+            } 
+        }
+        public int MaxHealth { get { return maxHealth; } }
+        
+        // Movement
+        public int WalkSpeed { get { return walkSpeed; } }
+        public int JumpForce { get { return jumpForce; } }
+        public bool CanWalk { get { return canWalk; } }
+        public bool CanJump { get { return canJump; } }
+        public bool IsGrounded { get { return isGrounded; } set { isGrounded = value; } }
+        public float WalkInput { get { return walkInput; } }
+        public bool JumpInput { get { return jumpInput; } }
+
+        // Combat
+        public int MeleeDamage { get { return meleeDamage; } }
+        public int RangedDamage { get { return rangedDamage; } }
+        public bool CanAttack { get { return canAttack; } set { canAttack = value; } }
+        public Element[] UsableElements { get { return usableElements; } }
+        public Element SelectedElement { get { return selectedElement; } }
+        public bool MeleeInput { get { return meleeInput; } }
+        public bool RangedInput { get { return rangedInput; } }
+        #endregion
+
+        #region Unity Functions
+        private void Awake()
+        {
+            inputs = new InputEvents();
+            rb = GetComponent<Rigidbody2D>();
+
+            Inputs.Gameplay.Walk.started += ctx => { walkInput = ctx.ReadValue<float>(); };
+            Inputs.Gameplay.Walk.canceled += ctx => { walkInput = ctx.ReadValue<float>(); };
+            Inputs.Gameplay.Jump.started += ctx => { jumpInput = ctx.ReadValueAsButton(); };
+            Inputs.Gameplay.Jump.canceled += ctx => { jumpInput = ctx.ReadValueAsButton(); };
+            Inputs.Gameplay.MeleeAttack.started += ctx => { meleeInput = ctx.ReadValueAsButton(); };
+            Inputs.Gameplay.MeleeAttack.canceled += ctx => { meleeInput = ctx.ReadValueAsButton(); };
+            Inputs.Gameplay.RangedAttack.started += ctx => { rangedInput = ctx.ReadValueAsButton(); };
+            Inputs.Gameplay.RangedAttack.canceled += ctx => { rangedInput = ctx.ReadValueAsButton(); };
+        }
+
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (collision.gameObject.layer == LayerMask.NameToLayer("Ground")) IsGrounded = true;
+        }
+
+        private void OnEnable()
+        {
+            Inputs.Enable();
+        }
+        private void OnDisable()
+        {
+            Inputs.Disable();
+        }
+        #endregion
+    }
+}
