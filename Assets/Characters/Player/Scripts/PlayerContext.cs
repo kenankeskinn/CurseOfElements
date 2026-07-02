@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace PlayerManager
 {
@@ -20,7 +21,6 @@ namespace PlayerManager
     #endregion
 
     [RequireComponent(typeof(Rigidbody2D))]
-    [RequireComponent(typeof(InputEvents))]
     public class PlayerContext : MonoBehaviour
     {
         #region Variables
@@ -63,6 +63,28 @@ namespace PlayerManager
         [Header("Input Info")]
         [SerializeField] bool meleeInput = false;
         [SerializeField] bool rangedInput = false;
+
+        [Space(20)]
+
+        [Header("-- INTERACTION --")]
+        [Header("Gameplay Info")]
+        [SerializeField] bool canInteract = true;
+
+        [Header("Input Info")]
+        [SerializeField] bool interactionInput = false;
+
+        [Space(20)]
+
+        [Header("-- ANIMATION --")]
+        [SerializeField] bool isIdleing = true;
+        [SerializeField] bool isWalking = false;
+        [SerializeField] bool isJumping = false;
+        [SerializeField] bool isFalling = false;
+        [SerializeField] bool isInteracting = false;
+        [SerializeField] bool isMeleeAttacking = false;
+        [SerializeField] bool isRangedAttacking = false;
+        [SerializeField] bool isTakingDamage = false;
+        [SerializeField] bool isDead = false;
         #endregion
 
         #region Properties
@@ -100,6 +122,27 @@ namespace PlayerManager
         public Element SelectedElement { get { return selectedElement; } }
         public bool MeleeInput { get { return meleeInput; } }
         public bool RangedInput { get { return rangedInput; } }
+
+        // Interaction
+        public bool InteractionInput { get { return interactionInput; } }
+
+        // Animation
+        public bool IsIdleing
+        {
+            get
+            {
+                isIdleing = !IsWalking && !IsJumping && !IsFalling && !IsMeleeAttacking && !IsRangedAttacking;
+                return isIdleing;
+            }
+        }
+        public bool IsWalking { get { return isWalking; } set { isWalking = value; } }
+        public bool IsJumping { get { return isJumping; } set { isJumping = value; } }
+        public bool IsFalling { get { return isFalling; } set { isFalling = value; } }
+        public bool IsInteracting { get { return isInteracting; } set { isInteracting = value; } }
+        public bool IsMeleeAttacking { get { return isMeleeAttacking; } set { isMeleeAttacking = value; } }
+        public bool IsRangedAttacking { get { return isRangedAttacking; } set { isRangedAttacking = value; } }
+        public bool IsTakingDamage { get { return isTakingDamage; } set { isTakingDamage = value; } }
+        public bool IsDead { get { return isDead; } set { isDead = value; } }
         #endregion
 
         #region Unity Functions
@@ -116,6 +159,8 @@ namespace PlayerManager
             Inputs.Gameplay.MeleeAttack.canceled += ctx => { meleeInput = ctx.ReadValueAsButton(); };
             Inputs.Gameplay.RangedAttack.started += ctx => { rangedInput = ctx.ReadValueAsButton(); };
             Inputs.Gameplay.RangedAttack.canceled += ctx => { rangedInput = ctx.ReadValueAsButton(); };
+            Inputs.Gameplay.Interaction.started += ctx => { interactionInput = ctx.ReadValueAsButton(); };
+            Inputs.Gameplay.Interaction.canceled += ctx => { interactionInput = ctx.ReadValueAsButton(); };
         }
 
         private void OnCollisionEnter2D(Collision2D collision)

@@ -85,6 +85,9 @@ namespace PlayerManager
             if (attackType == AttackType.Melee) yield return new WaitForSeconds(meleeResetTime);
             else yield return new WaitForSeconds(rangedResetTime);
 
+            _player.IsMeleeAttacking = false;
+            _player.IsRangedAttacking = false;
+
             _player.CanAttack = true;
         }
 
@@ -92,6 +95,8 @@ namespace PlayerManager
         {
             if (attackType == AttackType.Melee)
             {
+                _player.IsRangedAttacking = false;
+                _player.IsMeleeAttacking = true;
                 switch (_player.SelectedElement)
                 {
                     case Element.Wind: return _player.MeleeDamage + 3;
@@ -102,6 +107,8 @@ namespace PlayerManager
             }
             else if (attackType == AttackType.Ranged)
             {
+                _player.IsMeleeAttacking = false;
+                _player.IsRangedAttacking = true;
                 switch (_player.SelectedElement)
                 {
                     case Element.Wind: return _player.RangedDamage + 3;
