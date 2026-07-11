@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace PlayerManager
 {
+    [RequireComponent(typeof(PlayerContext))]
     public class AnimationController : MonoBehaviour
     {
         PlayerContext _player;

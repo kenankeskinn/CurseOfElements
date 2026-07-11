@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace PlayerManager
 {
+    [RequireComponent(typeof(PlayerContext))]
     class CombatController : MonoBehaviour
     {
         PlayerContext _player;

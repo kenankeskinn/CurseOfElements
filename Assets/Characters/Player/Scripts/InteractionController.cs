@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace PlayerManager
 {
+    [RequireComponent(typeof(PlayerContext))]
     class InteractionController : MonoBehaviour
     {
         PlayerContext _player;

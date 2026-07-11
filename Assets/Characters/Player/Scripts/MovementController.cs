@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace PlayerManager
 {
+    [RequireComponent(typeof(PlayerContext))]
     public class MovementController : MonoBehaviour
     {
         PlayerContext _player;
@@ -18,7 +19,7 @@ namespace PlayerManager
             else
                 transform.localScale = new Vector2(-1, transform.localScale.y);
 
-            _player.Rigidbody.linearVelocity = new Vector2(_player.WalkInput * _player.WalkSpeed, _player.Rigidbody.linearVelocity.y);
+            _player.Rigidbody.linearVelocityX = _player.WalkInput * _player.WalkSpeed;
             _player.IsWalking = true;
         }
 

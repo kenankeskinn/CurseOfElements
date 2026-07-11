@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
 namespace PlayerManager
 {
@@ -29,6 +28,7 @@ namespace PlayerManager
         private Rigidbody2D rb;
 
         [Header("-- STATS --")]
+        [SerializeField] string characterName = "";
         [SerializeField][Range(0, 100)] int currentHealth = 100;
         [SerializeField] int maxHealth = 100;
 
@@ -76,7 +76,6 @@ namespace PlayerManager
         [Space(20)]
 
         [Header("-- ANIMATION --")]
-        [SerializeField] bool isIdleing = true;
         [SerializeField] bool isWalking = false;
         [SerializeField] bool isJumping = false;
         [SerializeField] bool isFalling = false;
@@ -127,14 +126,6 @@ namespace PlayerManager
         public bool InteractionInput { get { return interactionInput; } }
 
         // Animation
-        public bool IsIdleing
-        {
-            get
-            {
-                isIdleing = !IsWalking && !IsJumping && !IsFalling && !IsMeleeAttacking && !IsRangedAttacking;
-                return isIdleing;
-            }
-        }
         public bool IsWalking { get { return isWalking; } set { isWalking = value; } }
         public bool IsJumping { get { return isJumping; } set { isJumping = value; } }
         public bool IsFalling { get { return isFalling; } set { isFalling = value; } }
@@ -163,7 +154,7 @@ namespace PlayerManager
             Inputs.Gameplay.Interaction.canceled += ctx => { interactionInput = ctx.ReadValueAsButton(); };
         }
 
-        private void OnCollisionEnter2D(Collision2D collision)
+        private void OnCollisionEnter2D(Collision2D collision) // ??????
         {
             if (collision.gameObject.layer == LayerMask.NameToLayer("Ground")) IsGrounded = true;
         }
