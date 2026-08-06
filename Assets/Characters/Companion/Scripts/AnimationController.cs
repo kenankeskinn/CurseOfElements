@@ -1,7 +1,7 @@
 using PlayerManager;
 using UnityEngine;
 
-namespace Companion
+namespace CompanionManager
 {
     [RequireComponent(typeof(CompanionContext))]
     class AnimationController : MonoBehaviour

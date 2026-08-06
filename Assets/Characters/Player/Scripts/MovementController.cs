@@ -25,11 +25,14 @@ namespace PlayerManager
 
         void Jump()
         {
-            if (_player.Rigidbody.linearVelocityY > 0.001) { _player.IsJumping = true; _player.IsFalling = false; }
-            else if (_player.Rigidbody.linearVelocityY < -0.001) { _player.IsJumping = false; _player.IsFalling = true; }
-            else { _player.IsJumping = false; _player.IsFalling = false; }
+            // Jump State Control
+            if (_player.IsGrounded) { _player.IsJumping = false; _player.IsFalling = false;  }
+            else if (_player.Rigidbody.linearVelocityY > 0.01) { _player.IsJumping = true; _player.IsFalling = false; }
+            else if (_player.Rigidbody.linearVelocityY < -0.01) { _player.IsJumping = false; _player.IsFalling = true; }
 
-            if (!(_player.IsGrounded && _player.JumpInput)) { return; }
+            // -------------------------------------------- Function Task --------------------------------------------
+
+            if (!(_player.CanJump && _player.JumpInput && _player.IsGrounded )) { return; }
 
             _player.Rigidbody.linearVelocity = new Vector2(_player.Rigidbody.linearVelocity.x, _player.JumpForce * 3f);
             _player.IsGrounded = false;
@@ -51,8 +54,8 @@ namespace PlayerManager
 
             RaycastHit2D hitR = Physics2D.Raycast(rightFootPos, Vector2.down, .25f, groundLayer);
             RaycastHit2D hitL = Physics2D.Raycast(leftFootPos, Vector2.down, .25f, groundLayer);
-            Debug.DrawRay(rightFootPos, Vector2.down * .25f, Color.red);
-            Debug.DrawRay(leftFootPos, Vector2.down * .25f, Color.red);
+            Debug.DrawRay(rightFootPos, Vector2.down * .25f, Color.whiteSmoke);
+            Debug.DrawRay(leftFootPos, Vector2.down * .25f, Color.whiteSmoke);
 
             _player.IsGrounded = hitR.collider != null || hitL.collider != null;
         }

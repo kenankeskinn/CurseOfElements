@@ -1,36 +1,34 @@
+using EnemyManager;
 using UnityEngine;
 
-namespace Companion
+namespace CompanionManager
 {
-    public enum CompanionState
-    {
-        Idle,
-        Walk,
-        Jump, // Can change
-        Attack
-    }
-
+    [RequireComponent(typeof(Rigidbody2D))]
     public class CompanionContext : MonoBehaviour
     {
         #region Variables
         // References
         private Rigidbody2D rb;
 
-        [Header("Stats")]
+        [Header("-- General --")]
         [SerializeField] string characterName = "";
-        [SerializeField][Range(0, 100)] int currentHealth = 100;
+        [SerializeField][Range(0, 100)] int currentHealth;
         [SerializeField] int maxHealth = 100;
-        [SerializeField][EnumButtons] CompanionState currentState;
+        [SerializeField] Transform playerTransform;
 
         [Space(20)]
 
         [Header("-- MOVEMENT --")]
         [Header("Settings")]
         [SerializeField][Range(1, 5)] float walkSpeed = 1.5f;
+        [SerializeField][Range(1, 5)] float jumpForce = 4;
         [SerializeField][Range(1, 5)] float minFollowDistance = 2.5f;
+        [SerializeField] LayerMask jumpOnObjectsLayer;
 
         [Header("Gameplay Info")]
         [SerializeField] bool canWalk = true;
+        [SerializeField] bool canJump = true;
+        [SerializeField] bool canFallowCharacter = true;
 
         [Space(20)]
 
@@ -38,9 +36,12 @@ namespace Companion
         [Header("Settings")]
         [SerializeField] int meleeDamage = 15;
         [SerializeField] int rangedDamage = 10;
+        [SerializeField] float rangeOfAttack = 1.25f;
+        [SerializeField] LayerMask targetLayer;
 
         [Header("Gameplay Info")]
         [SerializeField] bool canAttack = true;
+        [SerializeField] GameObject target;
 
         [Space(20)]
 
@@ -59,7 +60,7 @@ namespace Companion
         // References
         public Rigidbody2D Rigidbody { get { return rb; } }
 
-        // Stats
+        // General
         public int CurrentHealth
         {
             get { return currentHealth; }
@@ -71,17 +72,24 @@ namespace Companion
             }
         }
         public int MaxHealth { get { return maxHealth; } }
-        public CompanionState CurrentState { get { return currentState; } set { currentState = value; } }
+        public Transform PlayerTransform { get { return playerTransform; } }
 
         // Movement
         public float WalkSpeed { get { return walkSpeed; } }
+        public float JumpForce { get { return jumpForce; } }
         public float MinFollowDistance { get { return minFollowDistance; } }
-        public bool CanWalk { get { return canWalk; } }
+        public LayerMask JumpOnObjectsLayer { get { return jumpOnObjectsLayer; } }
+        public bool CanWalk { get { return canWalk; } set { canWalk = value; } }
+        public bool CanJump { get { return canJump; } set { canJump = value; } }
+        public bool CanFallowCharacter { get { return canFallowCharacter; } set { canFallowCharacter = value; }  }
 
         // Combat
         public int MeleeDamage { get { return meleeDamage; } }
         public int RangedDamage { get { return rangedDamage; } }
+        public float RangeOfAttack { get { return rangeOfAttack; } set { rangeOfAttack = value; } }
+        public LayerMask TargetLayer { get { return targetLayer; } }
         public bool CanAttack { get { return canAttack; } set { canAttack = value; } }
+        public GameObject Target { get { return target; } set { target = value; } }
 
         // Animation
         public bool IsWalking { get { return isWalking; } set { isWalking = value; } }
@@ -97,6 +105,10 @@ namespace Companion
         private void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
+            currentHealth = maxHealth;
+            jumpOnObjectsLayer = ~LayerMask.GetMask("Companion", "Player", "Ground", "Enemy"); // Interactable
+            targetLayer = LayerMask.GetMask("Enemy");
+            playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
         }
         #endregion
     }

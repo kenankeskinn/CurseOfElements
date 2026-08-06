@@ -34,7 +34,7 @@ namespace PlayerManager
         #endregion
 
         #region Unity Functions
-        private void Start()
+        private void Awake()
         {
             _player = GetComponent<PlayerContext>();
             animator = gameObject.GetComponentInChildren<Animator>();

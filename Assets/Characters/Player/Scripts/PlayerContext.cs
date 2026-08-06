@@ -12,9 +12,9 @@ namespace PlayerManager
         Fire
     }
 
-    enum AttackType 
-    { 
-        Melee, 
+    enum AttackType
+    {
+        Melee,
         Ranged
     }
     #endregion
@@ -29,7 +29,7 @@ namespace PlayerManager
 
         [Header("-- STATS --")]
         [SerializeField] string characterName = "";
-        [SerializeField][Range(0, 100)] int currentHealth = 100;
+        [SerializeField][Range(0, 1000)] int currentHealth;
         [SerializeField] int maxHealth = 100;
 
         [Space(20)]
@@ -54,11 +54,17 @@ namespace PlayerManager
         [Header("Settings")]
         [SerializeField] int meleeDamage = 15;
         [SerializeField] int rangedDamage = 10;
+        [SerializeField] float meleeResetTime = .58f;
+        [SerializeField] float rangedResetTime = .58f;
+        [SerializeField] float rangeOfAttack = 1f;
 
         [Header("Gameplay Info")]
         [SerializeField] bool canAttack = true;
-        [EnumButtons] [SerializeField] Element[] usableElements = { };
-        [EnumButtons] [SerializeField] Element selectedElement = Element.None;
+        [SerializeField] bool canTakeDamage = true;
+
+        [Header("Element Info")]
+        [EnumButtons][SerializeField] Element[] usableElements = { };
+        [EnumButtons][SerializeField] Element selectedElement = Element.None;
 
         [Header("Input Info")]
         [SerializeField] bool meleeInput = false;
@@ -76,6 +82,7 @@ namespace PlayerManager
         [Space(20)]
 
         [Header("-- ANIMATION --")]
+        [Header("States")]
         [SerializeField] bool isWalking = false;
         [SerializeField] bool isJumping = false;
         [SerializeField] bool isFalling = false;
@@ -92,23 +99,23 @@ namespace PlayerManager
         public Rigidbody2D Rigidbody { get { return rb; } }
 
         // Stats
-        public int CurrentHealth 
-        { 
+        public int CurrentHealth
+        {
             get { return currentHealth; }
-            set 
-            { 
-                if (value < 0) value = 0; 
-                else if (value > MaxHealth) value = 100;
-                else currentHealth = value; 
-            } 
+            set
+            {
+                if (value < 0) currentHealth = 0;
+                else if (value > MaxHealth) currentHealth = MaxHealth;
+                else currentHealth = value;
+            }
         }
         public int MaxHealth { get { return maxHealth; } }
-        
+
         // Movement
         public int WalkSpeed { get { return walkSpeed; } }
         public int JumpForce { get { return jumpForce; } }
-        public bool CanWalk { get { return canWalk; } }
-        public bool CanJump { get { return canJump; } }
+        public bool CanWalk { get { return canWalk; } set { canWalk = value; } }
+        public bool CanJump { get { return canJump; } set { canJump = value; } }
         public bool IsGrounded { get { return isGrounded; } set { isGrounded = value; } }
         public float WalkInput { get { return walkInput; } }
         public bool JumpInput { get { return jumpInput; } }
@@ -116,7 +123,11 @@ namespace PlayerManager
         // Combat
         public int MeleeDamage { get { return meleeDamage; } }
         public int RangedDamage { get { return rangedDamage; } }
+        public float MeleeResetTime { get { return meleeResetTime; } }
+        public float RangedResetTime { get { return rangedResetTime; } }
+        public float RangeOfAttack { get { return rangeOfAttack; } }
         public bool CanAttack { get { return canAttack; } set { canAttack = value; } }
+        public bool CanTakeDamage { get { return canTakeDamage; } set { canTakeDamage = value; } }
         public Element[] UsableElements { get { return usableElements; } }
         public Element SelectedElement { get { return selectedElement; } }
         public bool MeleeInput { get { return meleeInput; } }
@@ -134,6 +145,8 @@ namespace PlayerManager
         public bool IsRangedAttacking { get { return isRangedAttacking; } set { isRangedAttacking = value; } }
         public bool IsTakingDamage { get { return isTakingDamage; } set { isTakingDamage = value; } }
         public bool IsDead { get { return isDead; } set { isDead = value; } }
+
+        // 
         #endregion
 
         #region Unity Functions
@@ -141,6 +154,8 @@ namespace PlayerManager
         {
             inputs = new InputEvents();
             rb = GetComponent<Rigidbody2D>();
+
+            currentHealth = maxHealth;
 
             Inputs.Gameplay.Walk.started += ctx => { walkInput = ctx.ReadValue<float>(); };
             Inputs.Gameplay.Walk.canceled += ctx => { walkInput = ctx.ReadValue<float>(); };
@@ -152,11 +167,6 @@ namespace PlayerManager
             Inputs.Gameplay.RangedAttack.canceled += ctx => { rangedInput = ctx.ReadValueAsButton(); };
             Inputs.Gameplay.Interaction.started += ctx => { interactionInput = ctx.ReadValueAsButton(); };
             Inputs.Gameplay.Interaction.canceled += ctx => { interactionInput = ctx.ReadValueAsButton(); };
-        }
-
-        private void OnCollisionEnter2D(Collision2D collision) // ??????
-        {
-            if (collision.gameObject.layer == LayerMask.NameToLayer("Ground")) IsGrounded = true;
         }
 
         private void OnEnable()
