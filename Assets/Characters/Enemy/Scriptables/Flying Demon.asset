@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0fc532587a39e44969b02dbf7cf581, type: 3}
   m_Name: Flying Demon
   m_EditorClassIdentifier: Assembly-CSharp::EnemyManager.EnemyScriptable
-  enemyType: 0
+  enemyType: 3
   maxHealth: 100
   walkSpeed: 3
   attackDamage: 25

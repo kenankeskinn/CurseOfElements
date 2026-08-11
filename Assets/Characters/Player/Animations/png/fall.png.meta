@@ -14,6 +14,12 @@ TextureImporter:
   - first:
       213: -4388410108566013805
     second: fall_3
+  - first:
+      213: -200338194739338904
+    second: fall_4
+  - first:
+      213: 1348780117957853513
+    second: fall_5
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -81,7 +87,7 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 512
     resizeAlgorithm: 0
     textureFormat: -1
     textureCompression: 2
@@ -127,7 +133,7 @@ TextureImporter:
         serializedVersion: 2
         x: 4
         y: 7
-        width: 21
+        width: 20
         height: 23
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -149,7 +155,7 @@ TextureImporter:
         serializedVersion: 2
         x: 36
         y: 7
-        width: 20
+        width: 21
         height: 23
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -193,7 +199,7 @@ TextureImporter:
         serializedVersion: 2
         x: 100
         y: 7
-        width: 21
+        width: 20
         height: 23
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -205,6 +211,50 @@ TextureImporter:
       bones: []
       spriteID: 398703ec14c3913c0800000000000000
       internalID: -4388410108566013805
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fall_4
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 7
+        width: 21
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8616e9b2971483df0800000000000000
+      internalID: -200338194739338904
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fall_5
+      rect:
+        serializedVersion: 2
+        x: 164
+        y: 7
+        width: 21
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 941ccf20f54d7b210800000000000000
+      internalID: 1348780117957853513
       vertices: []
       indices: 
       edges: []
@@ -227,6 +277,8 @@ TextureImporter:
       fall_1: -8269792095265539674
       fall_2: -2808048858112833009
       fall_3: -4388410108566013805
+      fall_4: -200338194739338904
+      fall_5: 1348780117957853513
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

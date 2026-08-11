@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d0fc532587a39e44969b02dbf7cf581, type: 3}
   m_Name: Ghoul
   m_EditorClassIdentifier: Assembly-CSharp::EnemyManager.EnemyScriptable
-  enemyType: 0
+  enemyType: 2
   maxHealth: 50
   walkSpeed: 2
   attackDamage: 20
