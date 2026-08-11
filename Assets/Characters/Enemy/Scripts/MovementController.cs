@@ -12,8 +12,8 @@ namespace EnemyManager
         #region Custom Functions
         void PlayerSeenCheck()
         {
-            RaycastHit2D detectorSeenHit = Physics2D.Raycast(transform.position, _enemy.DetectorDirection, _enemy.RangeOfView, _enemy.PlayerLayer);
-            Debug.DrawRay(transform.position, _enemy.DetectorDirection * _enemy.RangeOfView, Color.purple);
+            RaycastHit2D detectorSeenHit = Physics2D.Raycast(transform.position, _enemy.DetectorDirection, _enemy.EnemyScriptable.RangeOfView, _enemy.EnemyScriptable.PlayerLayer);
+            Debug.DrawRay(transform.position, _enemy.DetectorDirection * _enemy.EnemyScriptable.RangeOfView, Color.purple);
 
             _enemy.PlayerDetected = detectorSeenHit.collider != null;
 
@@ -53,12 +53,12 @@ namespace EnemyManager
             if (isRight)
             {
                 transform.localScale = new Vector2(1, transform.localScale.y);
-                _enemy.Rigidbody.linearVelocityX = _enemy.WalkSpeed;
+                _enemy.Rigidbody.linearVelocityX = _enemy.EnemyScriptable.WalkSpeed;
             }
             else
             {
                 transform.localScale = new Vector2(-1, transform.localScale.y);
-                _enemy.Rigidbody.linearVelocityX = -_enemy.WalkSpeed;
+                _enemy.Rigidbody.linearVelocityX = -_enemy.EnemyScriptable.WalkSpeed;
             }
 
             _enemy.IsWalking = true;

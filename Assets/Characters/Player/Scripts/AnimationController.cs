@@ -5,7 +5,6 @@ namespace PlayerManager
     [RequireComponent(typeof(PlayerContext))]
     public class AnimationController : MonoBehaviour
     {
-        PlayerContext _player;
         Animator animator;
 
         // Animation Hashes
@@ -22,21 +21,20 @@ namespace PlayerManager
         #region Custom Functions
         void ChangeAnimation()
         {
-            animator.SetBool(WalkHash, _player.IsWalking);
-            animator.SetBool(JumpHash, _player.IsJumping);
-            animator.SetBool(FallHash, _player.IsFalling);
-            animator.SetBool(InteractHash, _player.IsInteracting);
-            animator.SetBool(MeleeHash, _player.IsMeleeAttacking);
-            animator.SetBool(RangedHash, _player.IsRangedAttacking);
-            animator.SetBool(DamageHash, _player.IsTakingDamage);
-            animator.SetBool(DeadHash, _player.IsDead);
+            animator.SetBool(WalkHash, PlayerContext.Instance.IsWalking);
+            animator.SetBool(JumpHash, PlayerContext.Instance.IsJumping);
+            animator.SetBool(FallHash, PlayerContext.Instance.IsFalling);
+            animator.SetBool(InteractHash, PlayerContext.Instance.IsInteracting);
+            animator.SetBool(MeleeHash, PlayerContext.Instance.IsMeleeAttacking);
+            animator.SetBool(RangedHash, PlayerContext.Instance.IsRangedAttacking);
+            animator.SetBool(DamageHash, PlayerContext.Instance.IsTakingDamage);
+            animator.SetBool(DeadHash, PlayerContext.Instance.IsDead);
         }
         #endregion
 
         #region Unity Functions
         private void Awake()
         {
-            _player = GetComponent<PlayerContext>();
             animator = gameObject.GetComponentInChildren<Animator>();
         }
 

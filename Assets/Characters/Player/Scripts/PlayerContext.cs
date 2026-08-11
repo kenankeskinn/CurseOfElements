@@ -26,6 +26,7 @@ namespace PlayerManager
         // References
         private InputEvents inputs;
         private Rigidbody2D rb;
+        public static PlayerContext Instance { get; private set; }
 
         [Header("-- STATS --")]
         [SerializeField] string characterName = "";
@@ -152,6 +153,10 @@ namespace PlayerManager
         #region Unity Functions
         private void Awake()
         {
+            if (Instance != null) { Destroy(this); return; }
+            Instance = this;
+            DontDestroyOnLoad(this);
+
             inputs = new InputEvents();
             rb = GetComponent<Rigidbody2D>();
 

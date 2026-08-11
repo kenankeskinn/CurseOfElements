@@ -14,8 +14,8 @@ namespace EnemyManager
         #region Custom Functions
         void PlayerCheck()
         {
-            _enemy.DetectorAttackHit = Physics2D.Raycast(transform.position, _enemy.DetectorDirection, _enemy.RangeOfAttack, _enemy.PlayerLayer);
-            Debug.DrawRay(transform.position, _enemy.DetectorDirection * _enemy.RangeOfAttack, Color.aquamarine);
+            _enemy.DetectorAttackHit = Physics2D.Raycast(transform.position, _enemy.DetectorDirection, _enemy.EnemyScriptable.RangeOfAttack, _enemy.EnemyScriptable.PlayerLayer);
+            Debug.DrawRay(transform.position, _enemy.DetectorDirection * _enemy.EnemyScriptable.RangeOfAttack, Color.aquamarine);
 
             // if AttackHit null
             if (_enemy.DetectorAttackHit.collider == null) { return; }
@@ -29,7 +29,7 @@ namespace EnemyManager
             if (!_enemy.CanAttack) { attackCoroutine = null; yield break; }
 
             // Attack Function (there is only Player to take damage because of that we don't need to take damage takeable object)
-            playerCombatController.TakeDamage(_enemy.AttackDamage, gameObject);
+            playerCombatController.TakeDamage(_enemy.EnemyScriptable.AttackDamage, gameObject);
 
             // Reset Operations
             _enemy.CanWalk = false;
@@ -39,7 +39,7 @@ namespace EnemyManager
             yield return new WaitForSeconds(.5f); // animation reset time
             _enemy.IsAttacking = false;
 
-            yield return new WaitForSeconds(_enemy.AttackResetTime);
+            yield return new WaitForSeconds(_enemy.EnemyScriptable.AttackResetTime);
 
             _enemy.CanWalk = true;
             _enemy.CanAttack = true;

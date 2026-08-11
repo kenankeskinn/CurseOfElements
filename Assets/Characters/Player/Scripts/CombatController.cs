@@ -6,7 +6,6 @@ namespace PlayerManager
     [RequireComponent(typeof(PlayerContext))]
     class CombatController : MonoBehaviour
     {
-        PlayerContext _player;
         Coroutine attackCoroutine;
         Coroutine takeDamageCoroutine;
         LayerMask enemyLayer;
@@ -18,17 +17,17 @@ namespace PlayerManager
         {
             // Debug Ray
             if (transform.localScale.x == 1) 
-                Debug.DrawRay(transform.position, Vector2.right * _player.RangeOfAttack, Color.darkRed);
+                Debug.DrawRay(transform.position, Vector2.right * PlayerContext.Instance.RangeOfAttack, Color.darkRed);
             else
-                Debug.DrawRay(transform.position, Vector2.left * _player.RangeOfAttack, Color.darkRed);
+                Debug.DrawRay(transform.position, Vector2.left * PlayerContext.Instance.RangeOfAttack, Color.darkRed);
 
             // -------------------------------------------- Function Task --------------------------------------------
 
-            if (!_player.CanAttack || (!_player.MeleeInput && !_player.RangedInput) || attackCoroutine != null) { return; }
+            if (!PlayerContext.Instance.CanAttack || (!PlayerContext.Instance.MeleeInput && !PlayerContext.Instance.RangedInput) || attackCoroutine != null) { return; }
 
             AttackType attackType;
 
-            if (_player.MeleeInput) attackType = AttackType.Melee;
+            if (PlayerContext.Instance.MeleeInput) attackType = AttackType.Melee;
             else attackType = AttackType.Ranged;
             SetAttackState(attackType);
 
@@ -36,7 +35,7 @@ namespace PlayerManager
             if (transform.localScale.x == 1) lookDirection = 1;
             else lookDirection = -1;
 
-            RaycastHit2D enemyHit = Physics2D.Raycast(transform.position, Vector2.right, lookDirection * _player.RangeOfAttack, enemyLayer);
+            RaycastHit2D enemyHit = Physics2D.Raycast(transform.position, Vector2.right, lookDirection * PlayerContext.Instance.RangeOfAttack, enemyLayer);
 
             // -- After hitting an enemy --
             if (enemyHit.collider != null)
@@ -45,9 +44,9 @@ namespace PlayerManager
                 enemyHit.transform.GetComponent<EnemyManager.CombatController>().TakeDamage(CalculateDamage(attackType));
 
                 // 2-) Apply Attack Effects if there is an Element.
-                if      (_player.SelectedElement == Element.Wind)   WindEffect (attackType,  enemyHit.collider.gameObject);
-                else if (_player.SelectedElement == Element.Water)  WaterEffect(attackType,  enemyHit.collider.gameObject);
-                else if (_player.SelectedElement == Element.Fire)   FireEffect (attackType,  enemyHit.collider.gameObject);
+                if      (PlayerContext.Instance.SelectedElement == Element.Wind)   WindEffect (attackType,  enemyHit.collider.gameObject);
+                else if (PlayerContext.Instance.SelectedElement == Element.Water)  WaterEffect(attackType,  enemyHit.collider.gameObject);
+                else if (PlayerContext.Instance.SelectedElement == Element.Fire)   FireEffect (attackType,  enemyHit.collider.gameObject);
             }
             // ----------------------------
 
@@ -57,9 +56,9 @@ namespace PlayerManager
 
         public void TakeDamage(int damage, GameObject enemy)
         {
-            if (!_player.CanTakeDamage) { return; }
+            if (!PlayerContext.Instance.CanTakeDamage) { return; }
 
-            _player.CurrentHealth -= damage;
+            PlayerContext.Instance.CurrentHealth -= damage;
             if (takeDamageCoroutine == null) takeDamageCoroutine = StartCoroutine(ResetTakeDamage());
 
             // Send message to companion
@@ -71,15 +70,15 @@ namespace PlayerManager
                 return;
             }
 
-            if (_player.CurrentHealth <= 0) Die();
+            if (PlayerContext.Instance.CurrentHealth <= 0) Die();
         }
 
         void Die()
         {
-            _player.CanWalk = false;
-            _player.CanJump = false;
-            _player.CanAttack = false;
-            _player.CanTakeDamage = false;
+            PlayerContext.Instance.CanWalk = false;
+            PlayerContext.Instance.CanJump = false;
+            PlayerContext.Instance.CanAttack = false;
+            PlayerContext.Instance.CanTakeDamage = false;
 
             Debug.Log($"{name} Died!");
             Destroy(gameObject);
@@ -125,33 +124,33 @@ namespace PlayerManager
         // Support Functions
         IEnumerator ResetAttack(AttackType attackType)
         {
-            _player.CanWalk = false;
-            _player.CanJump = false;
+            PlayerContext.Instance.CanWalk = false;
+            PlayerContext.Instance.CanJump = false;
 
-            if (attackType == AttackType.Melee) yield return new WaitForSeconds(_player.MeleeResetTime);
-            else yield return new WaitForSeconds(_player.RangedResetTime);
+            if (attackType == AttackType.Melee) yield return new WaitForSeconds(PlayerContext.Instance.MeleeResetTime);
+            else yield return new WaitForSeconds(PlayerContext.Instance.RangedResetTime);
 
-            _player.CanWalk = true;
-            _player.CanJump = true;
-            _player.IsMeleeAttacking = false;
-            _player.IsRangedAttacking = false;
+            PlayerContext.Instance.CanWalk = true;
+            PlayerContext.Instance.CanJump = true;
+            PlayerContext.Instance.IsMeleeAttacking = false;
+            PlayerContext.Instance.IsRangedAttacking = false;
 
             attackCoroutine = null;
         }
 
         IEnumerator ResetTakeDamage()
         {
-            _player.CanWalk = false;
-            _player.CanJump = false;
-            _player.CanAttack = false;
-            _player.IsTakingDamage = true;
+            PlayerContext.Instance.CanWalk = false;
+            PlayerContext.Instance.CanJump = false;
+            PlayerContext.Instance.CanAttack = false;
+            PlayerContext.Instance.IsTakingDamage = true;
 
             yield return new WaitForSeconds(.34f);
 
-            _player.CanWalk = true;
-            _player.CanJump = true;
-            _player.CanAttack = true;
-            _player.IsTakingDamage = false;
+            PlayerContext.Instance.CanWalk = true;
+            PlayerContext.Instance.CanJump = true;
+            PlayerContext.Instance.CanAttack = true;
+            PlayerContext.Instance.IsTakingDamage = false;
 
             takeDamageCoroutine = null;
         }
@@ -160,13 +159,13 @@ namespace PlayerManager
         {
             if (attackType == AttackType.Melee)
             {
-                _player.IsRangedAttacking = false;
-                _player.IsMeleeAttacking = true;
+                PlayerContext.Instance.IsRangedAttacking = false;
+                PlayerContext.Instance.IsMeleeAttacking = true;
             }
             else if (attackType == AttackType.Ranged)
             {
-                _player.IsMeleeAttacking = false;
-                _player.IsRangedAttacking = true;
+                PlayerContext.Instance.IsMeleeAttacking = false;
+                PlayerContext.Instance.IsRangedAttacking = true;
             }
         }
 
@@ -174,22 +173,22 @@ namespace PlayerManager
         {
             if (attackType == AttackType.Melee)
             {
-                switch (_player.SelectedElement)
+                switch (PlayerContext.Instance.SelectedElement)
                 {
-                    case Element.Wind: return _player.MeleeDamage + 3;
-                    case Element.Water: return _player.MeleeDamage + 5;
-                    case Element.Fire: return _player.MeleeDamage + 10;
-                    default: return _player.MeleeDamage;
+                    case Element.Wind: return PlayerContext.Instance.MeleeDamage + 3;
+                    case Element.Water: return PlayerContext.Instance.MeleeDamage + 5;
+                    case Element.Fire: return PlayerContext.Instance.MeleeDamage + 10;
+                    default: return PlayerContext.Instance.MeleeDamage;
                 }
             }
             else if (attackType == AttackType.Ranged)
             {
-                switch (_player.SelectedElement)
+                switch (PlayerContext.Instance.SelectedElement)
                 {
-                    case Element.Wind: return _player.RangedDamage + 3;
-                    case Element.Water: return _player.RangedDamage + 5;
-                    case Element.Fire: return _player.RangedDamage + 10;
-                    default: return _player.RangedDamage;
+                    case Element.Wind: return PlayerContext.Instance.RangedDamage + 3;
+                    case Element.Water: return PlayerContext.Instance.RangedDamage + 5;
+                    case Element.Fire: return PlayerContext.Instance.RangedDamage + 10;
+                    default: return PlayerContext.Instance.RangedDamage;
                 }
             }
             else return 0;
@@ -199,7 +198,6 @@ namespace PlayerManager
         #region Unity Functions
         private void Start()
         {
-            _player = GetComponent<PlayerContext>();
             enemyLayer = LayerMask.GetMask("Enemy");
             companionCombatController = GameObject.FindGameObjectWithTag("Companion").GetComponent<CompanionManager.CombatController>();
         }

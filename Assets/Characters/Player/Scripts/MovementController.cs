@@ -5,37 +5,36 @@ namespace PlayerManager
     [RequireComponent(typeof(PlayerContext))]
     public class MovementController : MonoBehaviour
     {
-        PlayerContext _player;
         LayerMask groundLayer;
         Vector2 rightFootPos, leftFootPos;
 
         #region Custom Functions
         void Walk()
         {
-            if (!(_player.CanWalk && _player.WalkInput != 0)) { _player.IsWalking = false; return; }
+            if (!(PlayerContext.Instance.CanWalk && PlayerContext.Instance.WalkInput != 0)) { PlayerContext.Instance.IsWalking = false; return; }
 
-            if (_player.WalkInput > 0)
+            if (PlayerContext.Instance.WalkInput > 0)
                 transform.localScale = new Vector2(1, transform.localScale.y);
             else
                 transform.localScale = new Vector2(-1, transform.localScale.y);
 
-            _player.Rigidbody.linearVelocityX = _player.WalkInput * _player.WalkSpeed;
-            _player.IsWalking = true;
+            PlayerContext.Instance.Rigidbody.linearVelocityX = PlayerContext.Instance.WalkInput * PlayerContext.Instance.WalkSpeed;
+            PlayerContext.Instance.IsWalking = true;
         }
 
         void Jump()
         {
             // Jump State Control
-            if (_player.IsGrounded) { _player.IsJumping = false; _player.IsFalling = false;  }
-            else if (_player.Rigidbody.linearVelocityY > 0.01) { _player.IsJumping = true; _player.IsFalling = false; }
-            else if (_player.Rigidbody.linearVelocityY < -0.01) { _player.IsJumping = false; _player.IsFalling = true; }
+            if (PlayerContext.Instance.IsGrounded) { PlayerContext.Instance.IsJumping = false; PlayerContext.Instance.IsFalling = false;  }
+            else if (PlayerContext.Instance.Rigidbody.linearVelocityY > 0.01) { PlayerContext.Instance.IsJumping = true; PlayerContext.Instance.IsFalling = false; }
+            else if (PlayerContext.Instance.Rigidbody.linearVelocityY < -0.01) { PlayerContext.Instance.IsJumping = false; PlayerContext.Instance.IsFalling = true; }
 
             // -------------------------------------------- Function Task --------------------------------------------
 
-            if (!(_player.CanJump && _player.JumpInput && _player.IsGrounded )) { return; }
+            if (!(PlayerContext.Instance.CanJump && PlayerContext.Instance.JumpInput && PlayerContext.Instance.IsGrounded )) { return; }
 
-            _player.Rigidbody.linearVelocity = new Vector2(_player.Rigidbody.linearVelocity.x, _player.JumpForce * 3f);
-            _player.IsGrounded = false;
+            PlayerContext.Instance.Rigidbody.linearVelocity = new Vector2(PlayerContext.Instance.Rigidbody.linearVelocity.x, PlayerContext.Instance.JumpForce * 3f);
+            PlayerContext.Instance.IsGrounded = false;
         }
 
         // Support Functions
@@ -57,14 +56,13 @@ namespace PlayerManager
             Debug.DrawRay(rightFootPos, Vector2.down * .25f, Color.whiteSmoke);
             Debug.DrawRay(leftFootPos, Vector2.down * .25f, Color.whiteSmoke);
 
-            _player.IsGrounded = hitR.collider != null || hitL.collider != null;
+            PlayerContext.Instance.IsGrounded = hitR.collider != null || hitL.collider != null;
         }
         #endregion
 
         #region Unity Functions
         private void Start()
         {
-            _player = GetComponent<PlayerContext>();
             groundLayer = LayerMask.GetMask("Ground");
             rightFootPos = transform.GetChild(1).GetChild(0).position; // Player -> Foots -> Foot_R
             leftFootPos = transform.GetChild(1).GetChild(1).position;  // Player -> Foots -> Foot_L

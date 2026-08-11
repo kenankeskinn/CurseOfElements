@@ -5,12 +5,10 @@ namespace PlayerManager
     [RequireComponent(typeof(PlayerContext))]
     class InteractionController : MonoBehaviour
     {
-        PlayerContext _player;
-
         #region Custom Functions
         void Interaction()
         {
-            if (!_player.InteractionInput) { return; }
+            if (!PlayerContext.Instance.InteractionInput) { return; }
 
             float lookDirection;
             if (transform.localScale.x == 1) lookDirection = 1f;    // Right
@@ -26,11 +24,6 @@ namespace PlayerManager
         #endregion
 
         #region Unity Functions
-        private void Start()
-        {
-           _player = GetComponent<PlayerContext>(); 
-        }
-
         private void Update()
         {
             Interaction();

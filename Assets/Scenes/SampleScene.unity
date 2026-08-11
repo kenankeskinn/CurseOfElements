@@ -678,6 +678,7 @@ MonoBehaviour:
   characterName: 
   currentHealth: 100
   maxHealth: 100
+  playerTransform: {fileID: 0}
   walkSpeed: 3
   jumpForce: 3
   minFollowDistance: 2.5
@@ -942,7 +943,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerManager.PlayerController
   characterName: 
   currentHealth: 100
-  maxHealth: 1000
+  maxHealth: 100
   walkSpeed: 3
   jumpForce: 4
   canWalk: 1
@@ -1404,7 +1405,7 @@ Rigidbody2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -1467,21 +1468,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 014a164cb4bde194a854c92b30a5b48a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyManager.EnemyContext
-  enemyType: 0
-  rangeOfView: 8
-  rangeOfAttack: 1.25
-  attackResetTime: 1
-  maxHealth: 20
   currentHealth: 0
-  attackDamage: 20
-  walkSpeed: 2
+  enemyScriptable: {fileID: 11400000, guid: 8cf5942ae8ecfdc45b50809fa03c0b77, type: 2}
   isWalking: 0
   isAttacking: 0
   isTakingDamage: 0
   isDead: 0
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 0
   detectorDirection: {x: 0, y: 0}
   playerDetected: 0
   canWalk: 1
