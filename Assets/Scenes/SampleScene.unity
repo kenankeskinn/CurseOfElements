@@ -178,7 +178,7 @@ Transform:
   m_GameObject: {fileID: 164710026}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.1600003, y: -3.15, z: 0}
+  m_LocalPosition: {x: -2.1600003, y: -3.56, z: 0}
   m_LocalScale: {x: 0.6266048, y: 0.58, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -388,7 +388,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -14.24, y: -2.33, z: -10}
+  m_LocalPosition: {x: -14.24, y: -2.86, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -644,6 +644,7 @@ GameObject:
   - component: {fileID: 923161630}
   - component: {fileID: 923161629}
   - component: {fileID: 923161634}
+  - component: {fileID: 923161635}
   m_Layer: 8
   m_Name: Companion
   m_TagString: Companion
@@ -687,9 +688,10 @@ MonoBehaviour:
     m_Bits: 0
   canWalk: 1
   canJump: 1
-  canFallowCharacter: 1
-  meleeDamage: 15
-  rangedDamage: 10
+  canFallowPlayer: 1
+  isGrounded: 1
+  attackDamage: 15
+  attackResetTime: 0.4
   rangeOfAttack: 1.25
   targetLayer:
     serializedVersion: 2
@@ -699,8 +701,7 @@ MonoBehaviour:
   isWalking: 0
   isJumping: 0
   isFalling: 0
-  isMeleeAttacking: 0
-  isRangedAttacking: 0
+  isAttacking: 0
   isTakingDamage: 0
   isDead: 0
 --- !u!4 &923161631
@@ -712,7 +713,7 @@ Transform:
   m_GameObject: {fileID: 923161628}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -17.22, y: -3.2, z: 0}
+  m_LocalPosition: {x: -17.22, y: -3.73, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -804,6 +805,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7496b7d28ed50d4296a891790836356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CompanionManager.CombatController
+--- !u!114 &923161635
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 923161628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4762d7ef74d55c44cae22019c76641e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CompanionManager.AnimationController
 --- !u!1 &933000507
 GameObject:
   m_ObjectHideFlags: 0
@@ -909,7 +922,7 @@ Transform:
   m_GameObject: {fileID: 933000507}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -14.24, y: -3.33, z: 0}
+  m_LocalPosition: {x: -14.24, y: -3.86, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -943,7 +956,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerManager.PlayerController
   characterName: 
   currentHealth: 100
-  maxHealth: 100
+  maxHealth: 1000
   walkSpeed: 3
   jumpForce: 4
   canWalk: 1
@@ -1071,7 +1084,7 @@ Transform:
   m_GameObject: {fileID: 1523164451}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 4.63, y: -3.15, z: 0}
+  m_LocalPosition: {x: 4.63, y: -3.56, z: 0}
   m_LocalScale: {x: 0.6266048, y: 0.58, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1222,7 +1235,7 @@ Transform:
   m_GameObject: {fileID: 1712785506}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -7.87, y: -3.15, z: 0}
+  m_LocalPosition: {x: -7.87, y: -3.56, z: 0}
   m_LocalScale: {x: 0.6266048, y: 0.58, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1376,7 +1389,7 @@ Transform:
   m_GameObject: {fileID: 1784706169}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -11.79, y: -3.12, z: 0}
+  m_LocalPosition: {x: -11.79, y: -3.6499999, z: 0}
   m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1528,7 +1541,7 @@ GameObject:
   - component: {fileID: 1828820719}
   m_Layer: 3
   m_Name: Plane
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -1810,6 +1823,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2033857580}
   - component: {fileID: 2033857581}
+  - component: {fileID: 2033857582}
   m_Layer: 8
   m_Name: CompanionSkin
   m_TagString: Untagged
@@ -1881,8 +1895,8 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: -2
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0.78065246, b: 0.2320754, a: 1}
+  m_Sprite: {fileID: 8793639957104055765, guid: 9cf2cf4472c4d984fae886b51b1502dd, type: 3}
+  m_Color: {r: 0.97735846, g: 0.97735846, b: 0.97735846, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1891,6 +1905,28 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!95 &2033857582
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2033857579}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 500444201fa78194abb39359bd67d980, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &2037133622
 GameObject:
   m_ObjectHideFlags: 0
@@ -1987,7 +2023,7 @@ Transform:
   m_GameObject: {fileID: 2062318118}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -14.24, y: -2.33, z: -10}
+  m_LocalPosition: {x: -14.24, y: -2.86, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

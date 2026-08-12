@@ -26,7 +26,7 @@ namespace EnemyManager
 
         IEnumerator Attack()
         {
-            if (!_enemy.CanAttack) { attackCoroutine = null; yield break; }
+            if (!_enemy.CanAttack || _enemy.IsTakingDamage) { attackCoroutine = null; yield break; }
 
             // Attack Function (there is only Player to take damage because of that we don't need to take damage takeable object)
             playerCombatController.TakeDamage(_enemy.EnemyScriptable.AttackDamage, gameObject);
@@ -54,14 +54,12 @@ namespace EnemyManager
             _enemy.CurrentHealth -= damage;
             if (takeDamageCoroutine == null) takeDamageCoroutine = StartCoroutine(ResetTakeDamage());
 
-            if (_enemy.CurrentHealth <= 0) Die();
+            if (_enemy.IsDead) StartCoroutine(Die());
         }
 
-        void Die()
+        IEnumerator Die()
         {
-            _enemy.CanWalk = false;
-            _enemy.CanAttack = false;
-            _enemy.CanTakeDamage = false;
+            yield return new WaitForSeconds(3);
 
             Debug.Log($"{name} Died!");
             Destroy(gameObject);
@@ -87,12 +85,17 @@ namespace EnemyManager
         private void Awake()
         {
             _enemy = GetComponent<EnemyContext>();
+        }
+
+        private void Start()
+        {
             playerCombatController = _enemy.PlayerGameObject.GetComponent<PlayerManager.CombatController>();
         }
 
         private void Update()
         {
-            PlayerCheck();
+            if (!_enemy.IsDead)
+                PlayerCheck();
         }
         #endregion
     }

@@ -5,28 +5,38 @@ namespace CompanionManager
     [RequireComponent(typeof(CompanionContext))]
     class MovementController : MonoBehaviour
     {
-        CompanionContext _companion;
         Vector2 jumpOnCheckerPosition, jumpOnCheckerSize;
 
         #region Custom Functions
-        void FollowCharacter()
+        void FollowPlayer()
         {
-            if (!_companion.CanWalk && !_companion.CanFallowCharacter) { return; }
+            if (!CompanionContext.Instance.CanWalk || !CompanionContext.Instance.CanFallowPlayer) 
+            {
+                CompanionContext.Instance.IsWalking = false;
+                CompanionContext.Instance.IsJumping = false;
+                return;
+            }
             
-            float distance = Mathf.Abs(transform.position.x - _companion.PlayerTransform.position.x);
-            if (distance <= _companion.MinFollowDistance) { return; }
+            float distance = Mathf.Abs(transform.position.x - CompanionContext.Instance.PlayerTransform.position.x);
+            if (distance <= CompanionContext.Instance.MinFollowDistance) 
+            {
+                CompanionContext.Instance.IsWalking = false;
+                return; 
+            }
             if (distance >= 10f) { TeleportToPlayer(); return; }
-            
-            if (transform.position.x < _companion.PlayerTransform.position.x)
+
+            if (transform.position.x < CompanionContext.Instance.PlayerTransform.position.x)
             {
                 if (transform.localScale.x != 1) transform.localScale = new Vector2(1, transform.localScale.y);
-                _companion.Rigidbody.linearVelocityX = 1f * _companion.WalkSpeed;
+                CompanionContext.Instance.Rigidbody.linearVelocityX = 1f * CompanionContext.Instance.WalkSpeed;
             }
             else
             {
                 if (transform.localScale.x != -1) transform.localScale = new Vector2(-1, transform.localScale.y);
-                _companion.Rigidbody.linearVelocityX = -1f * _companion.WalkSpeed;
+                CompanionContext.Instance.Rigidbody.linearVelocityX = -1f * CompanionContext.Instance.WalkSpeed;
             }
+
+            CompanionContext.Instance.IsWalking = true;
 
             if (!JumpControl()) { return; } // If character don't need to jump
             Jump();
@@ -34,20 +44,19 @@ namespace CompanionManager
 
         public void TeleportToPlayer()
         {
-            if (transform.position.x < _companion.PlayerTransform.position.x) 
-                _companion.Rigidbody.MovePosition(new Vector2(_companion.PlayerTransform.position.x - 4f, 2));
+            if (transform.position.x < CompanionContext.Instance.PlayerTransform.position.x) 
+                CompanionContext.Instance.Rigidbody.MovePosition(new Vector2(CompanionContext.Instance.PlayerTransform.position.x - 4f, 2));
             else 
-                _companion.Rigidbody.MovePosition(new Vector2(_companion.PlayerTransform.position.x + 4f, 2));
+                CompanionContext.Instance.Rigidbody.MovePosition(new Vector2(CompanionContext.Instance.PlayerTransform.position.x + 4f, 2));
 
-            _companion.Target = null;
-            _companion.CanFallowCharacter = true;
+            CompanionContext.Instance.Target = null;
         }
         
         void Jump()
         {
-            if (!_companion.CanJump) { return; }
+            if (!CompanionContext.Instance.CanJump) { return; }
 
-            _companion.Rigidbody.linearVelocityY = _companion.JumpForce * 3 ;
+            CompanionContext.Instance.Rigidbody.linearVelocityY = CompanionContext.Instance.JumpForce * 3 ;
         }
 
         bool JumpControl()
@@ -57,16 +66,8 @@ namespace CompanionManager
             else 
                 jumpOnCheckerPosition = new Vector2(transform.position.x - .7f, transform.position.y);
 
-            if (Physics2D.OverlapBox(jumpOnCheckerPosition, jumpOnCheckerSize, 0, _companion.JumpOnObjectsLayer) != null) return true;
+            if (Physics2D.OverlapBox(jumpOnCheckerPosition, jumpOnCheckerSize, 0, CompanionContext.Instance.JumpOnObjectsLayer) != null) return true;
             else return false;
-        }
-
-        void StopTheSystem()
-        {
-            _companion.CanWalk = false;
-            _companion.CanJump = false;
-            _companion.CanAttack = false;
-            _companion.CanFallowCharacter = false;
         }
 
         private void OnDrawGizmos()
@@ -79,15 +80,29 @@ namespace CompanionManager
         #region Unity Functions
         private void Start()
         {
-            _companion = GetComponent<CompanionContext>();
             jumpOnCheckerSize = new Vector2(.5f, transform.localScale.y);
         }
 
         private void Update()
         {
-            if (_companion.PlayerTransform == null) { StopTheSystem(); return; }
+            FollowPlayer();
+        }
 
-            FollowCharacter();
+        // Just for state check
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if (collision.gameObject.CompareTag("Ground"))
+            {
+                CompanionContext.Instance.IsGrounded = true;
+            }
+        }
+
+        private void OnCollisionExit2D(Collision2D collision)
+        {
+            if (collision.gameObject.CompareTag("Ground"))
+            {
+                CompanionContext.Instance.IsGrounded = false;
+            }
         }
         #endregion
     }

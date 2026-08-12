@@ -35,7 +35,7 @@ namespace PlayerManager
         #region Unity Functions
         private void Awake()
         {
-            animator = gameObject.GetComponentInChildren<Animator>();
+            animator = GetComponentInChildren<Animator>();
         }
 
         private void Update()

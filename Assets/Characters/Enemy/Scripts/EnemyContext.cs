@@ -54,9 +54,14 @@ namespace EnemyManager
             get { return currentHealth; }
             set
             {
-                if (value < 0) value = 0;
+                if (value <= 0)
+                {
+                    value = 0;
+                    IsDead = true;
+                }
                 else if (value > EnemyScriptable.MaxHealth) value = EnemyScriptable.MaxHealth;
-                else currentHealth = value;
+                
+                currentHealth = value;
             }
         }
 
@@ -66,6 +71,20 @@ namespace EnemyManager
         public bool IsWalking { get { return isWalking; } set { isWalking = value; } }
         public bool IsAttacking { get { return isAttacking; }  set { isAttacking = value; } }
         public bool IsTakingDamage { get { return isTakingDamage; } set { isTakingDamage = value; } }
+        public bool IsDead 
+        { 
+            get { return isDead; } 
+            set 
+            { 
+                if (value == true)
+                {
+                    CanWalk = false;
+                    CanAttack = false;
+                    CanTakeDamage = false;
+                }
+                isDead = value; 
+            } 
+        }
 
         // Info
         public RaycastHit2D DetectorAttackHit { get { return detectorAttackHit; } set { detectorAttackHit = value; } }
@@ -83,12 +102,12 @@ namespace EnemyManager
         {
             currentHealth = EnemyScriptable.MaxHealth;
             rb = GetComponent<Rigidbody2D>();
-            playerGameObject = GameObject.FindWithTag("Player");
+            playerGameObject = GameObject.FindGameObjectWithTag("Player");
 
-            // Set enemy attributes
-            //switch (enemyType)
+            //// Set enemy attributes
+            //switch (EnemyScriptable.EnemyType)
             //{
-                
+
             //}
         }
         #endregion

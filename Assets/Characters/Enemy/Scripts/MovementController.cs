@@ -103,7 +103,7 @@ namespace EnemyManager
 
         private void FixedUpdate()
         {
-            if (_enemy.PlayerGameObject == null) { StopTheSystem(); return; }
+            if (_enemy.PlayerGameObject == null || _enemy.IsDead) { StopTheSystem(); return; }
 
             DetectorController();
 

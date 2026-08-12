@@ -1,4 +1,3 @@
-using EnemyManager;
 using UnityEngine;
 
 namespace CompanionManager
@@ -8,6 +7,8 @@ namespace CompanionManager
     {
         #region Variables
         // References
+        public static CompanionContext Instance { get; private set; }
+
         private Rigidbody2D rb;
 
         [Header("-- General --")]
@@ -28,14 +29,15 @@ namespace CompanionManager
         [Header("Gameplay Info")]
         [SerializeField] bool canWalk = true;
         [SerializeField] bool canJump = true;
-        [SerializeField] bool canFallowCharacter = true;
+        [SerializeField] bool canFallowPlayer = true;
+        [SerializeField] bool isGrounded = true;
 
         [Space(20)]
 
         [Header("-- COMBAT --")]
         [Header("Settings")]
-        [SerializeField] int meleeDamage = 15;
-        [SerializeField] int rangedDamage = 10;
+        [SerializeField] int attackDamage = 15;
+        [SerializeField] float attackResetTime = .4f;
         [SerializeField] float rangeOfAttack = 1.25f;
         [SerializeField] LayerMask targetLayer;
 
@@ -49,8 +51,7 @@ namespace CompanionManager
         [SerializeField] bool isWalking = false;
         [SerializeField] bool isJumping = false;
         [SerializeField] bool isFalling = false;
-        [SerializeField] bool isMeleeAttacking = false;
-        [SerializeField] bool isRangedAttacking = false;
+        [SerializeField] bool isAttacking = false;
         [SerializeField] bool isTakingDamage = false;
         [SerializeField] bool isDead = false;
 
@@ -72,31 +73,82 @@ namespace CompanionManager
             }
         }
         public int MaxHealth { get { return maxHealth; } }
-        public Transform PlayerTransform { get { return playerTransform; } }
+        public Transform PlayerTransform 
+        { 
+            get 
+            { 
+                if (playerTransform == null)
+                {
+                    CanWalk = false;
+                    CanJump = false;
+                    CanAttack = false;
+                }
+
+                return playerTransform;
+            } 
+        }
 
         // Movement
         public float WalkSpeed { get { return walkSpeed; } }
         public float JumpForce { get { return jumpForce; } }
         public float MinFollowDistance { get { return minFollowDistance; } }
         public LayerMask JumpOnObjectsLayer { get { return jumpOnObjectsLayer; } }
-        public bool CanWalk { get { return canWalk; } set { canWalk = value; } }
-        public bool CanJump { get { return canJump; } set { canJump = value; } }
-        public bool CanFallowCharacter { get { return canFallowCharacter; } set { canFallowCharacter = value; }  }
+        public bool CanWalk 
+        { 
+            get { return canWalk; }
+            private set
+            {
+                if (value == false) { IsWalking = false; }
+
+                canWalk = value; 
+            } 
+        }
+        public bool CanJump { get { return canJump; } private set { canJump = value; } }
+        public bool CanFallowPlayer { get { return canFallowPlayer; } }
+        public bool IsGrounded 
+        { 
+            get { return isGrounded; } 
+            set 
+            {
+                if (value == true)  { IsJumping = false; }
+                else                { IsJumping = true; }
+
+                isGrounded = value; 
+            } 
+        }
 
         // Combat
-        public int MeleeDamage { get { return meleeDamage; } }
-        public int RangedDamage { get { return rangedDamage; } }
+        public int AttackDamage { get { return attackDamage; } }
+        public float AttackResetTime { get { return attackResetTime; } }
         public float RangeOfAttack { get { return rangeOfAttack; } set { rangeOfAttack = value; } }
         public LayerMask TargetLayer { get { return targetLayer; } }
-        public bool CanAttack { get { return canAttack; } set { canAttack = value; } }
-        public GameObject Target { get { return target; } set { target = value; } }
+        public bool CanAttack 
+        { 
+            get { return canAttack; } 
+            private set 
+            { 
+                if (value == false) { IsAttacking = false; }
+
+                canAttack = value; 
+            } 
+        }
+        public GameObject Target 
+        { 
+            get { return target; } 
+            set 
+            { 
+                if (value == null)  { canFallowPlayer = true; }
+                else                { canFallowPlayer = false; }
+
+                target = value;
+            } 
+        }
 
         // Animation
         public bool IsWalking { get { return isWalking; } set { isWalking = value; } }
         public bool IsJumping { get { return isJumping; } set { isJumping = value; } }
         public bool IsFalling { get { return isFalling; } set { isFalling = value; } }
-        public bool IsMeleeAttacking { get { return isMeleeAttacking; } set { isMeleeAttacking = value; } }
-        public bool IsRangedAttacking { get { return isRangedAttacking; } set { isRangedAttacking = value; } }
+        public bool IsAttacking { get { return isAttacking; } set { isAttacking = value; } }
         public bool IsTakingDamage { get { return isTakingDamage; } set { isTakingDamage = value; } }
         public bool IsDead { get { return isDead; } set { isDead = value; } }
         #endregion
@@ -104,6 +156,10 @@ namespace CompanionManager
         #region Unity Functions
         private void Awake()
         {
+            if (Instance != null) { Destroy(this); return; }
+            Instance = this;
+            DontDestroyOnLoad(this);
+
             rb = GetComponent<Rigidbody2D>();
             currentHealth = maxHealth;
             jumpOnObjectsLayer = ~LayerMask.GetMask("Companion", "Player", "Ground", "Enemy"); // Interactable
