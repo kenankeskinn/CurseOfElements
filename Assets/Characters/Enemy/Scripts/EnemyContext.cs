@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace EnemyManager
@@ -41,6 +42,9 @@ namespace EnemyManager
         [SerializeField] bool canWalk = true;
         [SerializeField] bool canAttack = true;
         [SerializeField] bool canTakeDamage = true;
+        [SerializeField] bool isBurning = false;
+        [SerializeField] bool isSlowing = false;
+        [SerializeField] bool isPushing = false;
         #endregion
 
         #region Properties
@@ -70,7 +74,27 @@ namespace EnemyManager
         // Animation
         public bool IsWalking { get { return isWalking; } set { isWalking = value; } }
         public bool IsAttacking { get { return isAttacking; }  set { isAttacking = value; } }
-        public bool IsTakingDamage { get { return isTakingDamage; } set { isTakingDamage = value; } }
+        public bool IsTakingDamage 
+        { 
+            get { return isTakingDamage; } 
+            set 
+            { 
+                if (value == true)
+                {
+                    CanWalk = false;
+                    CanAttack = false;
+                    CanTakeDamage = false;
+                }
+                else
+                {
+                    CanWalk = true;
+                    CanAttack = true;
+                    CanTakeDamage = true;
+                }
+
+                isTakingDamage = value; 
+            } 
+        }
         public bool IsDead 
         { 
             get { return isDead; } 
@@ -95,6 +119,29 @@ namespace EnemyManager
         public bool CanWalk { get { return canWalk; } set { canWalk = value; } }
         public bool CanAttack { get { return canAttack; } set { canAttack = value; } }
         public bool CanTakeDamage { get { return canTakeDamage; } set { canTakeDamage = value; } }
+        public bool IsBurning { get { return isBurning; } set { isBurning = value; } }
+        public bool IsSlowing { get { return isSlowing; } set { isSlowing = value; } }
+        public bool IsPushing 
+        { 
+            get { return isPushing; } 
+            set 
+            { 
+                if (value == true)
+                {
+                    CanWalk = false;
+                    CanAttack = false;
+                    CanTakeDamage = false;
+                }
+                else
+                {
+                    CanWalk = true;
+                    CanAttack = true;
+                    CanTakeDamage = true;
+                }
+
+                isPushing = value; 
+            } 
+        }
         #endregion
 
         #region Unity Functions

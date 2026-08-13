@@ -1,3 +1,4 @@
+using PlayerManager;
 using System.Collections;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ namespace EnemyManager
         EnemyContext _enemy;
         Coroutine attackCoroutine;
         Coroutine takeDamageCoroutine;
+
         PlayerManager.CombatController playerCombatController;
 
         #region Custom Functions
@@ -54,6 +56,8 @@ namespace EnemyManager
             _enemy.CurrentHealth -= damage;
             if (takeDamageCoroutine == null) takeDamageCoroutine = StartCoroutine(ResetTakeDamage());
 
+            _enemy.PlayerDetected = true;
+
             if (_enemy.IsDead) StartCoroutine(Die());
         }
 
@@ -62,22 +66,74 @@ namespace EnemyManager
             yield return new WaitForSeconds(3);
 
             Debug.Log($"{name} Died!");
+
+            playerCombatController.Heal(_enemy.EnemyScriptable.HealReward);
+
             Destroy(gameObject);
         }
 
         IEnumerator ResetTakeDamage()
         {
-            _enemy.CanWalk = false;
-            _enemy.CanAttack = false;
             _enemy.IsTakingDamage = true;
 
             yield return new WaitForSeconds(.34f); // Take damage animation reset
 
-            _enemy.CanWalk = true;
-            _enemy.CanAttack = true;
             _enemy.IsTakingDamage = false;
 
             takeDamageCoroutine = null;
+        }
+
+        public void ApplyEffectSelf(EffectType effectType)
+        {
+            switch (effectType)
+            {
+                case EffectType.Burn:
+                    if (!_enemy.IsBurning) StartCoroutine(BurnEffect());
+                    break;
+                case EffectType.Slow:
+                    if (!_enemy.IsSlowing) StartCoroutine(SlowEffect());
+                    break;
+                case EffectType.Push:
+                    if (!_enemy.IsPushing) StartCoroutine(PushEffect());
+                    break;
+            }
+        }
+
+
+        // Element Effects
+        IEnumerator BurnEffect()
+        {
+            _enemy.IsBurning = true;
+
+            yield return new WaitForSeconds(1);
+            TakeDamage(1);
+            yield return new WaitForSeconds(1);
+            TakeDamage(1);
+            yield return new WaitForSeconds(1);
+
+            _enemy.IsBurning = false;
+        }
+
+        IEnumerator SlowEffect()
+        {
+            _enemy.IsSlowing = true;
+
+            yield return new WaitForSeconds(3);
+
+            _enemy.IsSlowing = false;
+        }
+        IEnumerator PushEffect()
+        {
+            _enemy.IsPushing = true;      
+
+            if (_enemy.PlayerGameObject.transform.localScale.x == 1)
+                _enemy.Rigidbody.linearVelocityX = _enemy.EnemyScriptable.WalkSpeed * 5f;
+            else
+                _enemy.Rigidbody.linearVelocityX = -_enemy.EnemyScriptable.WalkSpeed * 5f;
+
+            yield return new WaitForSeconds(2);
+
+            _enemy.IsPushing = false;
         }
         #endregion
 

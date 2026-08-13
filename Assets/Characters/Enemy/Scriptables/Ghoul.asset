@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Ghoul
   m_EditorClassIdentifier: Assembly-CSharp::EnemyManager.EnemyScriptable
   enemyType: 2
-  maxHealth: 50
+  maxHealth: 100
   walkSpeed: 2
+  healReward: 10
   attackDamage: 20
   rangeOfView: 8
   rangeOfAttack: 1.25

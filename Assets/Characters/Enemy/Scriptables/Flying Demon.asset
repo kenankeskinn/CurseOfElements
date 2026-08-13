@@ -15,6 +15,7 @@ MonoBehaviour:
   enemyType: 3
   maxHealth: 100
   walkSpeed: 3
+  healReward: 15
   attackDamage: 25
   rangeOfView: 8
   rangeOfAttack: 1.25

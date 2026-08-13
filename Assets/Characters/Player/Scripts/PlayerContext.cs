@@ -7,15 +7,22 @@ namespace PlayerManager
     public enum Element
     {
         None,
-        Wind,
+        Fire,
         Water,
-        Fire
+        Wind
     }
 
     enum AttackType
     {
         Melee,
         Ranged
+    }
+
+    public enum EffectType
+    {
+        Burn,
+        Slow,
+        Push
     }
     #endregion
 
@@ -58,6 +65,8 @@ namespace PlayerManager
         [SerializeField] float meleeResetTime = .58f;
         [SerializeField] float rangedResetTime = .58f;
         [SerializeField] float rangeOfAttack = 1f;
+        [SerializeField] Transform bulletStartTransform;
+        [SerializeField] GameObject[] elementBullets;
 
         [Header("Gameplay Info")]
         [SerializeField] bool canAttack = true;
@@ -127,6 +136,8 @@ namespace PlayerManager
         public float MeleeResetTime { get { return meleeResetTime; } }
         public float RangedResetTime { get { return rangedResetTime; } }
         public float RangeOfAttack { get { return rangeOfAttack; } }
+        public Transform BulletStartTransform { get { return bulletStartTransform; } }
+        public GameObject[] ElementBullets { get { return elementBullets; } }
         public bool CanAttack { get { return canAttack; } set { canAttack = value; } }
         public bool CanTakeDamage { get { return canTakeDamage; } set { canTakeDamage = value; } }
         public Element[] UsableElements { get { return usableElements; } }

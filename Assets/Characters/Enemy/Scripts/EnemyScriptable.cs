@@ -10,6 +10,7 @@ namespace EnemyManager
         [SerializeField] EnemyType enemyType;
         [SerializeField] int maxHealth = 10;
         [SerializeField][Range(1, 10)] int walkSpeed = 1;
+        [SerializeField] int healReward = 5;
 
         [Header("Combat Settings")]
         [SerializeField] int attackDamage = 10;
@@ -23,6 +24,7 @@ namespace EnemyManager
         public int MaxHealth { get { return maxHealth; } }
         public int WalkSpeed { get { return walkSpeed; } }
         public int AttackDamage { get { return attackDamage; } }
+        public int HealReward { get { return healReward; } }
         public float RangeOfView { get { return rangeOfView; } }
         public float RangeOfAttack { get { return rangeOfAttack; } }
         public float AttackResetTime { get { return attackResetTime; } }

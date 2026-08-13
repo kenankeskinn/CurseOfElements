@@ -50,15 +50,22 @@ namespace EnemyManager
 
         void Move(bool isRight)
         {
+            float speedMultiplier = 1;
+
+            if (_enemy.IsSlowing)
+            {
+                speedMultiplier = .35f;
+            }
+
             if (isRight)
             {
                 transform.localScale = new Vector2(1, transform.localScale.y);
-                _enemy.Rigidbody.linearVelocityX = _enemy.EnemyScriptable.WalkSpeed;
+                _enemy.Rigidbody.linearVelocityX = _enemy.EnemyScriptable.WalkSpeed * speedMultiplier;
             }
             else
             {
                 transform.localScale = new Vector2(-1, transform.localScale.y);
-                _enemy.Rigidbody.linearVelocityX = -_enemy.EnemyScriptable.WalkSpeed;
+                _enemy.Rigidbody.linearVelocityX = -_enemy.EnemyScriptable.WalkSpeed * speedMultiplier;
             }
 
             _enemy.IsWalking = true;

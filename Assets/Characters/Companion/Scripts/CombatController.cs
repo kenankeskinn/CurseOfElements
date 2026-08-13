@@ -60,11 +60,8 @@ namespace CompanionManager
             target.GetComponent<EnemyManager.CombatController>().TakeDamage(CompanionContext.Instance.AttackDamage);
 
             CompanionContext.Instance.IsAttacking = true;
-            Debug.Log("Reset Attack: Is Attacking = true");
-
             yield return new WaitForSeconds(CompanionContext.Instance.AttackResetTime); // attack reset time
             CompanionContext.Instance.IsAttacking = false;
-            Debug.Log("Reset Attack: Is Attacking = false");
 
             yield return new WaitForSeconds(CompanionContext.Instance.AttackResetTime / 2);
 

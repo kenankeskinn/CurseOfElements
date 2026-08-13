@@ -35,20 +35,48 @@ namespace PlayerManager
             if (transform.localScale.x == 1) lookDirection = 1;
             else lookDirection = -1;
 
-            RaycastHit2D enemyHit = Physics2D.Raycast(transform.position, Vector2.right, lookDirection * PlayerContext.Instance.RangeOfAttack, enemyLayer);
-
-            // -- After hitting an enemy --
-            if (enemyHit.collider != null)
+            // ---------------------------- Ranged Attack ----------------------------
+            if (attackType == AttackType.Ranged)
             {
-                // 1-) Deal Damage
-                enemyHit.transform.GetComponent<EnemyManager.CombatController>().TakeDamage(CalculateDamage(attackType));
+                GameObject bulletPrefab;
 
-                // 2-) Apply Attack Effects if there is an Element.
-                if      (PlayerContext.Instance.SelectedElement == Element.Wind)   WindEffect (attackType,  enemyHit.collider.gameObject);
-                else if (PlayerContext.Instance.SelectedElement == Element.Water)  WaterEffect(attackType,  enemyHit.collider.gameObject);
-                else if (PlayerContext.Instance.SelectedElement == Element.Fire)   FireEffect (attackType,  enemyHit.collider.gameObject);
+                if (PlayerContext.Instance.SelectedElement == Element.Fire)
+                    bulletPrefab = PlayerContext.Instance.ElementBullets[0];
+                else if (PlayerContext.Instance.SelectedElement == Element.Water)
+                    bulletPrefab = PlayerContext.Instance.ElementBullets[1];
+                else if (PlayerContext.Instance.SelectedElement == Element.Wind)
+                    bulletPrefab = PlayerContext.Instance.ElementBullets[2];
+                else
+                    bulletPrefab = null;
+
+                if (bulletPrefab != null)
+                {
+                    StartCoroutine(CreateBullet(bulletPrefab, lookDirection));                 
+                }
             }
-            // ----------------------------
+            // ----------------------------------------------------------------------
+
+
+            // ---------------------------- Melee Attack ----------------------------
+            if (attackType == AttackType.Melee)
+            {                
+                RaycastHit2D enemyHit = Physics2D.Raycast(transform.position, Vector2.right, lookDirection * PlayerContext.Instance.RangeOfAttack, enemyLayer);
+
+                // -- After hitting an enemy --
+                if (enemyHit.collider != null)
+                {
+                    EnemyManager.CombatController enemyCombat = enemyHit.transform.GetComponent<EnemyManager.CombatController>();
+
+                    // 1-) Deal Damage
+                    enemyCombat.TakeDamage(CalculateDamage(AttackType.Melee));
+
+                    // 2-) Apply Attack Effects if there is an Element.
+                    if (PlayerContext.Instance.SelectedElement == Element.Fire) enemyCombat.ApplyEffectSelf(EffectType.Burn);
+                    else if (PlayerContext.Instance.SelectedElement == Element.Water) enemyCombat.ApplyEffectSelf(EffectType.Slow);
+                    else if (PlayerContext.Instance.SelectedElement == Element.Wind) enemyCombat.ApplyEffectSelf(EffectType.Push);
+                }
+            }            
+            // ----------------------------------------------------------------------
 
             // Reset Attack
             attackCoroutine = StartCoroutine(ResetAttack(attackType));
@@ -66,11 +94,16 @@ namespace PlayerManager
                 companionCombatController.SetTarget(enemy);
             else
             {
-                Debug.LogError("Companion Combat Controller is Null");
+                //Debug.LogError("Companion Combat Controller is Null");
                 return;
             }
 
             if (PlayerContext.Instance.CurrentHealth <= 0) Die();
+        }
+
+        public void Heal(int heal)
+        {
+            PlayerContext.Instance.CurrentHealth += heal;
         }
 
         void Die()
@@ -84,56 +117,25 @@ namespace PlayerManager
             Destroy(gameObject);
         }
 
-        // Element Effects
-        void WindEffect(AttackType attackType, GameObject target) 
-        { 
-            if (attackType == AttackType.Melee) // Pushes back to enemies
-            {
-                Debug.Log("Melee Wind Attack");
-            }
-            else                                // Throwing wind ball and pushes back little
-            {
-                Debug.Log("Ranged Wind Attack");
-            }
-        }
-
-        void WaterEffect(AttackType attackType, GameObject target)
-        {
-            if (attackType == AttackType.Melee) // Freezes for a short time
-            {
-                Debug.Log("Melee Water Attack");
-            }
-            else                                // Movement and attackSpeed slow
-            {
-                Debug.Log("Ranged Water Attack");
-            }
-        }
-
-        void FireEffect(AttackType attackType, GameObject target)
-        {
-            if (attackType == AttackType.Melee) // Extra damage
-            {
-                Debug.Log("Melee Fire Attack");
-            }
-            else                                // Deals damage over time with a burning effect
-            {
-                Debug.Log("Ranged Fire Attack");
-            }
-        }
-
         // Support Functions
         IEnumerator ResetAttack(AttackType attackType)
         {
             PlayerContext.Instance.CanWalk = false;
             PlayerContext.Instance.CanJump = false;
+            PlayerContext.Instance.Rigidbody.linearVelocityY = 0;
+            PlayerContext.Instance.Rigidbody.gravityScale = 0;
 
             if (attackType == AttackType.Melee) yield return new WaitForSeconds(PlayerContext.Instance.MeleeResetTime);
             else yield return new WaitForSeconds(PlayerContext.Instance.RangedResetTime);
+            
+            PlayerContext.Instance.Rigidbody.gravityScale = 2;
+            PlayerContext.Instance.IsMeleeAttacking = false;
+            PlayerContext.Instance.IsRangedAttacking = false;
+
+            yield return new WaitForSeconds(.25f);
 
             PlayerContext.Instance.CanWalk = true;
             PlayerContext.Instance.CanJump = true;
-            PlayerContext.Instance.IsMeleeAttacking = false;
-            PlayerContext.Instance.IsRangedAttacking = false;
 
             attackCoroutine = null;
         }
@@ -169,29 +171,37 @@ namespace PlayerManager
             }
         }
 
-        int CalculateDamage(AttackType attackType)
+        public static int CalculateDamage(AttackType attackType)
         {
             if (attackType == AttackType.Melee)
             {
                 switch (PlayerContext.Instance.SelectedElement)
                 {
-                    case Element.Wind: return PlayerContext.Instance.MeleeDamage + 3;
+                    case Element.Fire: return PlayerContext.Instance.MeleeDamage + 3;
                     case Element.Water: return PlayerContext.Instance.MeleeDamage + 5;
-                    case Element.Fire: return PlayerContext.Instance.MeleeDamage + 10;
+                    case Element.Wind: return PlayerContext.Instance.MeleeDamage + 10;
                     default: return PlayerContext.Instance.MeleeDamage;
                 }
             }
-            else if (attackType == AttackType.Ranged)
+            else
             {
                 switch (PlayerContext.Instance.SelectedElement)
                 {
-                    case Element.Wind: return PlayerContext.Instance.RangedDamage + 3;
-                    case Element.Water: return PlayerContext.Instance.RangedDamage + 5;
-                    case Element.Fire: return PlayerContext.Instance.RangedDamage + 10;
-                    default: return PlayerContext.Instance.RangedDamage;
+                    case Element.Fire: return PlayerContext.Instance.RangedDamage;
+                    case Element.Water: return PlayerContext.Instance.RangedDamage + 3;
+                    case Element.Wind: return PlayerContext.Instance.RangedDamage + 5;
+                    default: return 0;
                 }
-            }
-            else return 0;
+            }            
+        }
+
+        IEnumerator CreateBullet(GameObject bulletPrefab, float lookDirection)
+        {
+            yield return new WaitForSeconds(PlayerContext.Instance.RangedResetTime - 0.2f);
+
+            Transform bullet = Instantiate(bulletPrefab).transform;
+            bullet.localPosition = PlayerContext.Instance.BulletStartTransform.position;
+            bullet.rotation = Quaternion.Euler(0, 0, 90 * lookDirection);
         }
         #endregion
 
