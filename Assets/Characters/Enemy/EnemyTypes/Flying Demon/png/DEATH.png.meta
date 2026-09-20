@@ -337,6 +337,28 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: DEATH_6
+      rect:
+        serializedVersion: 2
+        x: 508
+        y: 0
+        width: 59
+        height: 71
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c68c6dabdcf18e34da2cc9b83d726962
+      internalID: -1860500157
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -359,6 +381,7 @@ TextureImporter:
       DEATH_3: -2824850348822682002
       DEATH_4: -4395442915117589123
       DEATH_5: 7527047216810660112
+      DEATH_6: -1860500157
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

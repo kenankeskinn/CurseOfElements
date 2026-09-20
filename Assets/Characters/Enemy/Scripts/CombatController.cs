@@ -1,6 +1,7 @@
 using PlayerManager;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace EnemyManager
 {
@@ -10,14 +11,21 @@ namespace EnemyManager
         EnemyContext _enemy;
         Coroutine attackCoroutine;
         Coroutine takeDamageCoroutine;
+        Vector2 detectorPos;
 
         PlayerManager.CombatController playerCombatController;
+        CompanionManager.CombatController companionCombatController;
+
+        [Header("UI Operations")]
+        [SerializeField] Image healthBar;
 
         #region Custom Functions
         void PlayerCheck()
         {
-            _enemy.DetectorAttackHit = Physics2D.Raycast(transform.position, _enemy.DetectorDirection, _enemy.EnemyScriptable.RangeOfAttack, _enemy.EnemyScriptable.PlayerLayer);
-            Debug.DrawRay(transform.position, _enemy.DetectorDirection * _enemy.EnemyScriptable.RangeOfAttack, Color.aquamarine);
+            Vector2 detectorPos = new Vector2(transform.position.x, transform.position.y - 0.25f);
+
+            _enemy.DetectorAttackHit = Physics2D.Raycast(detectorPos, _enemy.DetectorDirection, _enemy.EnemyScriptable.RangeOfAttack, _enemy.EnemyScriptable.AttackableCharacterLayers);
+            Debug.DrawRay(detectorPos, _enemy.DetectorDirection * _enemy.EnemyScriptable.RangeOfAttack, Color.aquamarine);
 
             // if AttackHit null
             if (_enemy.DetectorAttackHit.collider == null) { return; }
@@ -31,7 +39,20 @@ namespace EnemyManager
             if (!_enemy.CanAttack || _enemy.IsTakingDamage) { attackCoroutine = null; yield break; }
 
             // Attack Function (there is only Player to take damage because of that we don't need to take damage takeable object)
-            playerCombatController.TakeDamage(_enemy.EnemyScriptable.AttackDamage, gameObject);
+            if (_enemy.DetectorAttackHit.collider.gameObject == _enemy.PlayerGameObject)
+            {
+                playerCombatController.TakeDamage(_enemy.EnemyScriptable.AttackDamage, gameObject);
+                Debug.Log("Attacked to Player");
+            }
+            else if (_enemy.DetectorAttackHit.collider.gameObject == _enemy.CompanionGameObject)
+            {
+                companionCombatController.TakeDamage(_enemy.EnemyScriptable.AttackDamage, gameObject);
+                Debug.Log("Attacked to Companion");
+            }
+            else
+            {
+                Debug.LogError("DetectorAttackHit hitted unknown object!");
+            }
 
             // Reset Operations
             _enemy.CanWalk = false;
@@ -49,25 +70,35 @@ namespace EnemyManager
             attackCoroutine = null;
         }
 
-        public void TakeDamage(int damage)
+        public void TakeDamage(int damage, GameObject character = null)
         {
             if (!_enemy.CanTakeDamage) { return; }
 
+            if (_enemy.IsTakingDamage) { return; }
+
             _enemy.CurrentHealth -= damage;
+            healthBar.fillAmount -= damage / (float)_enemy.EnemyScriptable.MaxHealth;
             if (takeDamageCoroutine == null) takeDamageCoroutine = StartCoroutine(ResetTakeDamage());
 
-            _enemy.PlayerDetected = true;
+            _enemy.IsPlayerSeen = true;
+
+            if (character != null) _enemy.ChaseTarget = character.transform;
 
             if (_enemy.IsDead) StartCoroutine(Die());
         }
 
         IEnumerator Die()
         {
+            GetComponent<Collider2D>().enabled = false;
+            _enemy.Rigidbody.bodyType = RigidbodyType2D.Static;
+            _enemy.Rigidbody.linearDamping = 1;
+            _enemy.Rigidbody.angularDamping = 1;
             yield return new WaitForSeconds(3);
 
             Debug.Log($"{name} Died!");
 
             playerCombatController.Heal(_enemy.EnemyScriptable.HealReward);
+            companionCombatController.Heal(_enemy.EnemyScriptable.HealReward + 5);
 
             Destroy(gameObject);
         }
@@ -98,7 +129,6 @@ namespace EnemyManager
                     break;
             }
         }
-
 
         // Element Effects
         IEnumerator BurnEffect()
@@ -146,6 +176,7 @@ namespace EnemyManager
         private void Start()
         {
             playerCombatController = _enemy.PlayerGameObject.GetComponent<PlayerManager.CombatController>();
+            companionCombatController = _enemy.CompanionGameObject.GetComponent<CompanionManager.CombatController>();
         }
 
         private void Update()

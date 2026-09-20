@@ -3,22 +3,26 @@ using UnityEngine;
 namespace EnemyManager
 {
     [RequireComponent(typeof(EnemyContext))]
-    public class MovementController : MonoBehaviour
+    public class MovemenetController : MonoBehaviour
     {
         EnemyContext _enemy;
         Vector2[] patrolPositions = new Vector2[2];
         int currentPatrolState = 0;
 
         #region Custom Functions
+
+        #region Status Decision-Makers
         void PlayerSeenCheck()
         {
-            RaycastHit2D detectorSeenHit = Physics2D.Raycast(transform.position, _enemy.DetectorDirection, _enemy.EnemyScriptable.RangeOfView, _enemy.EnemyScriptable.PlayerLayer);
+            RaycastHit2D detectorSeenHit = Physics2D.Raycast(transform.position, _enemy.DetectorDirection, _enemy.EnemyScriptable.RangeOfView, _enemy.EnemyScriptable.PlayerLayer); // PlayerLayer + CompanionLayer
             Debug.DrawRay(transform.position, _enemy.DetectorDirection * _enemy.EnemyScriptable.RangeOfView, Color.purple);
 
-            _enemy.PlayerDetected = detectorSeenHit.collider != null;
+            _enemy.IsPlayerSeen = detectorSeenHit.collider != null;
 
-            if (!_enemy.PlayerDetected) Patrol();
+            if (!_enemy.IsPlayerSeen) Patrol();
+            else _enemy.ChaseTarget = _enemy.PlayerGameObject.transform;
         }
+
         void Patrol()
         {
             if (!_enemy.CanWalk) { return; }
@@ -27,7 +31,7 @@ namespace EnemyManager
 
             if (currentPatrolState == 0) Move(true);
             else Move(false);
-            
+
             float distance = Mathf.Abs(transform.position.x - patrolPositions[currentPatrolState].x);
 
             if (distance < 0.25f) currentPatrolState++;
@@ -37,17 +41,19 @@ namespace EnemyManager
         {
             if (!_enemy.CanWalk) { _enemy.IsWalking = false; return; }
 
-            LookAtPlayer();
+            LookAtTheTarget(_enemy.ChaseTarget);
 
             if (_enemy.DetectorAttackHit.collider == null)
             {
-                if (_enemy.PlayerGameObject.transform.position.x > transform.position.x) Move(true);
-                else if (_enemy.PlayerGameObject.transform.position.x < transform.position.x) Move(false);
-                else { _enemy.IsWalking = false; }
+                if (_enemy.ChaseTarget.position.x > transform.position.x) Move(true);
+                else if (_enemy.ChaseTarget.position.x < transform.position.x) Move(false);
+                else _enemy.IsWalking = false;
             }
             else _enemy.IsWalking = false;
         }
+        #endregion
 
+        #region Actioners
         void Move(bool isRight)
         {
             float speedMultiplier = 1;
@@ -71,23 +77,11 @@ namespace EnemyManager
             _enemy.IsWalking = true;
         }
 
-        void DetectorController()
+        void LookAtTheTarget(Transform target)
         {
-            if (transform.localScale.x == 1)
-            {
-                _enemy.DetectorDirection = Vector2.right;
-            }
-            else
-            {
-                _enemy.DetectorDirection = Vector2.left;
-            }
-        }
-
-        void LookAtPlayer()
-        {
-            if (_enemy.PlayerGameObject.transform.position.x > transform.position.x) 
+            if (target.position.x > transform.position.x)
                 transform.localScale = new Vector2(1, transform.localScale.y);
-            else if (_enemy.PlayerGameObject.transform.position.x < transform.position.x)
+            else if (target.position.x < transform.position.x)
                 transform.localScale = new Vector2(-1, transform.localScale.y);
         }
 
@@ -97,6 +91,8 @@ namespace EnemyManager
             _enemy.CanAttack = false;
             _enemy.CanTakeDamage = false;
         }
+        #endregion
+
         #endregion
 
         #region Unity Functions
@@ -112,10 +108,20 @@ namespace EnemyManager
         {
             if (_enemy.PlayerGameObject == null || _enemy.IsDead) { StopTheSystem(); return; }
 
-            DetectorController();
+            // Detector direction control
+            if (transform.localScale.x == 1)
+            {
+                _enemy.DetectorDirection = Vector2.right;
+            }
+            else if (transform.localScale.x == -1)
+            {
+                _enemy.DetectorDirection = Vector2.left;
+            }
 
-            if (!_enemy.PlayerDetected) PlayerSeenCheck();
-            else Chase();
+            if (!_enemy.IsPlayerSeen)
+                PlayerSeenCheck();
+            else
+                Chase();
         }
         #endregion
     }

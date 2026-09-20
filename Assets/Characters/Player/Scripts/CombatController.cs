@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -8,11 +9,11 @@ namespace PlayerManager
     {
         Coroutine attackCoroutine;
         Coroutine takeDamageCoroutine;
+        Coroutine changeElementCoroutine;
         LayerMask enemyLayer;
         CompanionManager.CombatController companionCombatController;
 
         #region Custom Functions
-
         void Attack()
         {
             // Debug Ray
@@ -68,7 +69,7 @@ namespace PlayerManager
                     EnemyManager.CombatController enemyCombat = enemyHit.transform.GetComponent<EnemyManager.CombatController>();
 
                     // 1-) Deal Damage
-                    enemyCombat.TakeDamage(CalculateDamage(AttackType.Melee));
+                    enemyCombat.TakeDamage(CalculateDamage(AttackType.Melee), gameObject);
 
                     // 2-) Apply Attack Effects if there is an Element.
                     if (PlayerContext.Instance.SelectedElement == Element.Fire) enemyCombat.ApplyEffectSelf(EffectType.Burn);
@@ -87,6 +88,7 @@ namespace PlayerManager
             if (!PlayerContext.Instance.CanTakeDamage) { return; }
 
             PlayerContext.Instance.CurrentHealth -= damage;
+            PlayerContext.Instance.HealthBar.fillAmount -= damage / (float)PlayerContext.Instance.MaxHealth;
             if (takeDamageCoroutine == null) takeDamageCoroutine = StartCoroutine(ResetTakeDamage());
 
             // Send message to companion
@@ -94,8 +96,7 @@ namespace PlayerManager
                 companionCombatController.SetTarget(enemy);
             else
             {
-                //Debug.LogError("Companion Combat Controller is Null");
-                return;
+                Debug.LogError("Companion Combat Controller is Null");
             }
 
             if (PlayerContext.Instance.CurrentHealth <= 0) Die();
@@ -104,6 +105,99 @@ namespace PlayerManager
         public void Heal(int heal)
         {
             PlayerContext.Instance.CurrentHealth += heal;
+            PlayerContext.Instance.HealthBar.fillAmount += heal / (float)PlayerContext.Instance.MaxHealth;
+        }
+
+        public void EarnElement(Element newElement)
+        {
+            if (newElement == Element.None) 
+            { 
+                Debug.LogError("None or wrong element!");
+                return;
+            }
+
+            if (newElement == Element.Fire) // If player earning fire, that means this is first element.
+            {
+                PlayerContext.Instance.UsableElements[0] = Element.Fire;
+                PlayerContext.Instance.SelectedElement = Element.Fire;
+                PlayerContext.Instance.FireAnimator.SetBool("isSelected", true);
+                PlayerContext.Instance.FireImage.color = PlayerContext.Instance.UsedElement;
+            }
+            else if (newElement == Element.Water) 
+            { 
+                PlayerContext.Instance.UsableElements[1] = Element.Water;
+                PlayerContext.Instance.WaterImage.color = PlayerContext.Instance.UnUsedElement;
+            }
+            else if (newElement == Element.Wind) 
+            { 
+                PlayerContext.Instance.UsableElements[2] = Element.Wind;
+                PlayerContext.Instance.WindImage.color = PlayerContext.Instance.UnUsedElement;
+            }
+        }
+
+        void ChangeElement()
+        {
+            if (PlayerContext.Instance.UsableElements[0] == Element.None) { return; }
+            if (PlayerContext.Instance.UsableElements[1] == Element.None) { return; }
+
+            if (changeElementCoroutine != null) { return; }
+
+            int selectedElementOrder = 10;
+            int usableElementCount = 0;
+
+            foreach (var item in PlayerContext.Instance.UsableElements)
+            {
+                if (item == Element.None) break;
+                usableElementCount++;
+            }
+
+            for (int i = 0; i < usableElementCount; i++)
+            {
+                if (PlayerContext.Instance.SelectedElement == PlayerContext.Instance.UsableElements[i])
+                {
+                    selectedElementOrder = i;
+                    break;
+                }
+            }
+
+            // Error Handling
+            if (selectedElementOrder == 10) 
+            { 
+                Debug.LogError("Found an error when selecting element"); 
+                return;
+            }
+
+            // Next Element
+            if (PlayerContext.Instance.NextElementInput)
+            {
+                if (selectedElementOrder + 1 < usableElementCount)
+                {
+                    selectedElementOrder += 1;
+                }
+                else
+                {
+                    selectedElementOrder = 0;
+                }
+            }
+
+            // Previous Element
+            if (PlayerContext.Instance.PreviousElementInput)
+            {
+                if (selectedElementOrder - 1 >= 0)
+                {
+                    selectedElementOrder -= 1;
+                }
+                else
+                {
+                    selectedElementOrder = usableElementCount - 1;
+                }
+            }
+            
+            if (PlayerContext.Instance.UsableElements[selectedElementOrder] == Element.None) { return; } // If there is just 1 
+
+            PlayerContext.Instance.SelectedElement = PlayerContext.Instance.UsableElements[selectedElementOrder];
+
+            changeElementCoroutine = StartCoroutine(ResetChangeElement());
         }
 
         void Die()
@@ -112,6 +206,8 @@ namespace PlayerManager
             PlayerContext.Instance.CanJump = false;
             PlayerContext.Instance.CanAttack = false;
             PlayerContext.Instance.CanTakeDamage = false;
+            PlayerContext.Instance.Rigidbody.bodyType = RigidbodyType2D.Static;
+            GetComponent<Collider2D>().enabled = false;
 
             Debug.Log($"{name} Died!");
             Destroy(gameObject);
@@ -155,6 +251,12 @@ namespace PlayerManager
             PlayerContext.Instance.IsTakingDamage = false;
 
             takeDamageCoroutine = null;
+        }
+
+        IEnumerator ResetChangeElement()
+        {
+            yield return new WaitForSeconds(.5f);
+            changeElementCoroutine = null;
         }
 
         void SetAttackState(AttackType attackType)
@@ -209,12 +311,41 @@ namespace PlayerManager
         private void Start()
         {
             enemyLayer = LayerMask.GetMask("Enemy");
-            companionCombatController = GameObject.FindGameObjectWithTag("Companion").GetComponent<CompanionManager.CombatController>();
+            try
+            {
+                companionCombatController = GameObject.FindGameObjectWithTag("Companion").GetComponent<CompanionManager.CombatController>();
+            }
+            catch (System.Exception)
+            {
+                Debug.LogError("Companion Combat Controller is not found!");
+                throw;
+            }
+
+        }
+
+        private void OnGUI()
+        {
+            if (GUI.Button(new Rect(new Vector2(10, 10), new Vector2(150, 100)), "Earn Fire Element"))
+            {
+                EarnElement(Element.Fire);
+            }
+
+            if (GUI.Button(new Rect(new Vector2(200, 10), new Vector2(150, 100)), "Earn Water Element"))
+            {
+                EarnElement(Element.Water);
+            }
+
+            if (GUI.Button(new Rect(new Vector2(390, 10), new Vector2(150, 100)), "Earn Wind Element"))
+            {
+                EarnElement(Element.Wind);
+            }
         }
 
         private void Update()
         {
             Attack();
+
+            if (PlayerContext.Instance.NextElementInput || PlayerContext.Instance.PreviousElementInput) ChangeElement();
         }
         #endregion
     }

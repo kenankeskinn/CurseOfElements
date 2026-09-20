@@ -26,7 +26,7 @@ namespace EffectManager
             {
                 EnemyManager.CombatController enemyCombat = collider.GetComponent<EnemyManager.CombatController>();
 
-                enemyCombat.TakeDamage(CombatController.CalculateDamage(AttackType.Ranged));
+                enemyCombat.TakeDamage(CombatController.CalculateDamage(AttackType.Ranged), PlayerContext.Instance.gameObject);
 
                 switch (bulletScriptable.Type)
                 {

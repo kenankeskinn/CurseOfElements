@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace PlayerManager
 {
@@ -73,12 +74,14 @@ namespace PlayerManager
         [SerializeField] bool canTakeDamage = true;
 
         [Header("Element Info")]
-        [EnumButtons][SerializeField] Element[] usableElements = { };
+        [EnumButtons][SerializeField] Element[] usableElements = new Element[3];
         [EnumButtons][SerializeField] Element selectedElement = Element.None;
 
         [Header("Input Info")]
         [SerializeField] bool meleeInput = false;
         [SerializeField] bool rangedInput = false;
+        [SerializeField] bool nextElementInput = false;
+        [SerializeField] bool previousElementInput = false;
 
         [Space(20)]
 
@@ -101,6 +104,24 @@ namespace PlayerManager
         [SerializeField] bool isRangedAttacking = false;
         [SerializeField] bool isTakingDamage = false;
         [SerializeField] bool isDead = false;
+
+        [Space(20)]
+
+        [Header("-- UI OPERATIONS --")]
+        [Header("Image")]
+        [SerializeField] Image healthBar;
+        [SerializeField] Image fireImage;
+        [SerializeField] Image waterImage;
+        [SerializeField] Image windImage;
+
+        [Header("Animator")]
+        [SerializeField] Animator fireAnimator;
+        [SerializeField] Animator waterAnimator;
+        [SerializeField] Animator windAnimator;
+
+        [Header("Color")]
+        [SerializeField] Color unUsedElement;
+        [SerializeField] Color usedElement;
         #endregion
 
         #region Properties
@@ -141,9 +162,57 @@ namespace PlayerManager
         public bool CanAttack { get { return canAttack; } set { canAttack = value; } }
         public bool CanTakeDamage { get { return canTakeDamage; } set { canTakeDamage = value; } }
         public Element[] UsableElements { get { return usableElements; } }
-        public Element SelectedElement { get { return selectedElement; } }
+        public Element SelectedElement 
+        { 
+            get { return selectedElement; } 
+            set 
+            {
+                if (selectedElement != Element.None)
+                {
+                    switch (value)
+                    {
+                        case Element.Fire:
+                            FireImage.color = usedElement;
+                            FireAnimator.SetBool("isSelected", true);
+                            break;
+                        case Element.Water:
+                            WaterImage.color = usedElement;
+                            WaterAnimator.SetBool("isSelected", true);
+                            break;
+                        case Element.Wind:
+                            WindImage.color = usedElement;
+                            WindAnimator.SetBool("isSelected", true);
+                            break;
+                        default:
+                            break;
+                    }
+
+                    switch (selectedElement)
+                    {
+                        case Element.Fire:
+                            FireImage.color = unUsedElement;
+                            FireAnimator.SetBool("isSelected", false);
+                            break;
+                        case Element.Water:
+                            WaterImage.color = unUsedElement;
+                            WaterAnimator.SetBool("isSelected", false);
+                            break;
+                        case Element.Wind:
+                            WindImage.color = unUsedElement;
+                            WindAnimator.SetBool("isSelected", false);
+                            break;
+                        default:
+                            break;
+                    }
+                }           
+                                
+                selectedElement = value;
+            } 
+        }
         public bool MeleeInput { get { return meleeInput; } }
         public bool RangedInput { get { return rangedInput; } }
+        public bool NextElementInput { get  { return nextElementInput; } }
+        public bool PreviousElementInput { get  { return previousElementInput; } }
 
         // Interaction
         public bool InteractionInput { get { return interactionInput; } }
@@ -158,7 +227,16 @@ namespace PlayerManager
         public bool IsTakingDamage { get { return isTakingDamage; } set { isTakingDamage = value; } }
         public bool IsDead { get { return isDead; } set { isDead = value; } }
 
-        // 
+        // UI Operations
+        public Image HealthBar { get { return healthBar; } }
+        public Image FireImage { get { return fireImage; } }
+        public Image WaterImage { get { return waterImage; } }
+        public Image WindImage { get { return windImage; } }
+        public Animator FireAnimator { get { return fireAnimator; } }
+        public Animator WaterAnimator { get { return waterAnimator; } }
+        public Animator WindAnimator { get { return windAnimator; } }
+        public Color UnUsedElement { get { return unUsedElement; } }
+        public Color UsedElement { get { return usedElement; } }
         #endregion
 
         #region Unity Functions
@@ -183,6 +261,10 @@ namespace PlayerManager
             Inputs.Gameplay.RangedAttack.canceled += ctx => { rangedInput = ctx.ReadValueAsButton(); };
             Inputs.Gameplay.Interaction.started += ctx => { interactionInput = ctx.ReadValueAsButton(); };
             Inputs.Gameplay.Interaction.canceled += ctx => { interactionInput = ctx.ReadValueAsButton(); };
+            Inputs.Gameplay.NextElement.started += ctx => { nextElementInput = ctx.ReadValueAsButton(); };
+            Inputs.Gameplay.NextElement.canceled += ctx => { nextElementInput = ctx.ReadValueAsButton(); };
+            Inputs.Gameplay.PreviousElement.started += ctx => { previousElementInput = ctx.ReadValueAsButton(); };
+            Inputs.Gameplay.PreviousElement.canceled += ctx => { previousElementInput = ctx.ReadValueAsButton(); };
         }
 
         private void OnEnable()

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 namespace CompanionManager
 {
@@ -15,7 +16,7 @@ namespace CompanionManager
             if (CompanionContext.Instance.Target != null) { return; }
 
             // Set the target
-            CompanionContext.Instance.Target = target;
+            if (CompanionContext.Instance.Target != target) CompanionContext.Instance.Target = target;
 
             if (releaseAttackCoroutine == null) releaseAttackCoroutine = StartCoroutine(ReleaseAttack());
         }
@@ -25,6 +26,25 @@ namespace CompanionManager
             if (!CompanionContext.Instance.CanAttack) { return; }
 
             if (resetAttackCoroutine == null) resetAttackCoroutine = StartCoroutine(ResetAttack(target));
+        }
+
+        public void TakeDamage(int amount, GameObject target)
+        {
+            if (!CompanionContext.Instance.CanTakeDamage) { return; }
+
+            CompanionContext.Instance.CurrentHealth -= amount;
+            CompanionContext.Instance.HealthBar1.fillAmount -= amount / (float)CompanionContext.Instance.MaxHealth;
+            CompanionContext.Instance.HealthBar2.fillAmount -= amount / (float)CompanionContext.Instance.MaxHealth;
+            StartCoroutine(ResetTakeDamage());
+
+            SetTarget(target);
+        }
+
+        public void Heal(int amount)
+        {
+            CompanionContext.Instance.CurrentHealth += amount;
+            CompanionContext.Instance.HealthBar1.fillAmount += amount / (float)CompanionContext.Instance.MaxHealth;
+            CompanionContext.Instance.HealthBar2.fillAmount += amount / (float)CompanionContext.Instance.MaxHealth;
         }
 
         void Follow(Transform target)
@@ -57,7 +77,8 @@ namespace CompanionManager
 
         IEnumerator ResetAttack(Transform target)
         {
-            target.GetComponent<EnemyManager.CombatController>().TakeDamage(CompanionContext.Instance.AttackDamage);
+            target.GetComponent<EnemyManager.CombatController>().TakeDamage(CompanionContext.Instance.AttackDamage, gameObject);
+            Debug.LogWarning($"COMPANION: Attacking {target}!");
 
             CompanionContext.Instance.IsAttacking = true;
             yield return new WaitForSeconds(CompanionContext.Instance.AttackResetTime); // attack reset time
@@ -66,6 +87,13 @@ namespace CompanionManager
             yield return new WaitForSeconds(CompanionContext.Instance.AttackResetTime / 2);
 
             resetAttackCoroutine = null;
+        }
+
+        IEnumerator ResetTakeDamage()
+        {
+            CompanionContext.Instance.IsTakingDamage = true;
+            yield return new WaitForSeconds(.333f);
+            CompanionContext.Instance.IsTakingDamage = false;
         }
         #endregion
 

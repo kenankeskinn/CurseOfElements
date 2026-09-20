@@ -22,6 +22,7 @@ namespace EnemyManager
         // References
         private Rigidbody2D rb;
         private GameObject playerGameObject;
+        private GameObject companionGameObject;
 
         [Header("-- General --")]
         [SerializeField][Range(0, 100)] int currentHealth;
@@ -36,7 +37,8 @@ namespace EnemyManager
         [Header("-- Info --")]
         [SerializeField] RaycastHit2D detectorAttackHit;
         [SerializeField] Vector2 detectorDirection;
-        [SerializeField] bool playerDetected;
+        [SerializeField] Transform chaseTarget;
+        [SerializeField] bool isPlayerSeen;
 
         [Header("-- Gameplay Info --")]
         [SerializeField] bool canWalk = true;
@@ -51,6 +53,7 @@ namespace EnemyManager
         // References
         public Rigidbody2D Rigidbody { get { return rb; } }
         public GameObject PlayerGameObject { get { return playerGameObject; } }
+        public GameObject CompanionGameObject { get { return companionGameObject; } }
 
         // Stats
         public int CurrentHealth
@@ -113,7 +116,8 @@ namespace EnemyManager
         // Info
         public RaycastHit2D DetectorAttackHit { get { return detectorAttackHit; } set { detectorAttackHit = value; } }
         public Vector2 DetectorDirection { get { return detectorDirection; } set { detectorDirection = value; } }
-        public bool PlayerDetected { get { return playerDetected; } set { playerDetected = value; } }
+        public Transform ChaseTarget { get { return chaseTarget; } set { chaseTarget = value; } }
+        public bool IsPlayerSeen { get { return isPlayerSeen; } set { isPlayerSeen = value; } }
 
         // Gameplay Info
         public bool CanWalk { get { return canWalk; } set { canWalk = value; } }
@@ -150,12 +154,7 @@ namespace EnemyManager
             currentHealth = EnemyScriptable.MaxHealth;
             rb = GetComponent<Rigidbody2D>();
             playerGameObject = GameObject.FindGameObjectWithTag("Player");
-
-            //// Set enemy attributes
-            //switch (EnemyScriptable.EnemyType)
-            //{
-
-            //}
+            companionGameObject = GameObject.FindGameObjectWithTag("Companion");
         }
         #endregion
     }

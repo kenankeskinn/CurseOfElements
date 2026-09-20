@@ -18,6 +18,7 @@ namespace EnemyManager
         [SerializeField] float rangeOfAttack = 1.25f;
         [SerializeField] float attackResetTime = 1;
         [SerializeField] LayerMask playerLayer = 1 << 7;
+        [SerializeField] LayerMask attackableCharacterLayers = 1 << 7 | 1 << 8;
 
         // Properties
         public EnemyType EnemyType { get { return enemyType; } }
@@ -29,5 +30,6 @@ namespace EnemyManager
         public float RangeOfAttack { get { return rangeOfAttack; } }
         public float AttackResetTime { get { return attackResetTime; } }
         public LayerMask PlayerLayer { get { return playerLayer; } }
+        public LayerMask AttackableCharacterLayers { get { return attackableCharacterLayers; } }
     }
 }

@@ -10,7 +10,7 @@ namespace CompanionManager
         #region Custom Functions
         void FollowPlayer()
         {
-            if (!CompanionContext.Instance.CanWalk || !CompanionContext.Instance.CanFallowPlayer) 
+            if (!CompanionContext.Instance.CanWalk || !CompanionContext.Instance.CanFollowPlayer) 
             {
                 CompanionContext.Instance.IsWalking = false;
                 CompanionContext.Instance.IsJumping = false;

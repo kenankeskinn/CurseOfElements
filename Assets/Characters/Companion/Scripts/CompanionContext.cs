@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace CompanionManager
 {
@@ -29,7 +30,7 @@ namespace CompanionManager
         [Header("Gameplay Info")]
         [SerializeField] bool canWalk = true;
         [SerializeField] bool canJump = true;
-        [SerializeField] bool canFallowPlayer = true;
+        [SerializeField] bool canFollowPlayer = true;
         [SerializeField] bool isGrounded = true;
 
         [Space(20)]
@@ -40,9 +41,12 @@ namespace CompanionManager
         [SerializeField] float attackResetTime = .4f;
         [SerializeField] float rangeOfAttack = 1.25f;
         [SerializeField] LayerMask targetLayer;
+        [SerializeField] Image healthBar1;
+        [SerializeField] Image healthBar2;
 
         [Header("Gameplay Info")]
         [SerializeField] bool canAttack = true;
+        [SerializeField] bool canTakeDamage = true;
         [SerializeField] GameObject target;
 
         [Space(20)]
@@ -68,8 +72,22 @@ namespace CompanionManager
             set
             {
                 if (value < 0) value = 0;
-                else if (value > MaxHealth) value = 100;
-                else currentHealth = value;
+                else if (value > MaxHealth) value = MaxHealth;
+
+                currentHealth = value;
+
+                if (currentHealth == 0)
+                {
+                    CanWalk = false;
+                    CanJump = false;
+                    CanAttack = false;
+                    CanTakeDamage = false;
+                    Rigidbody.bodyType = RigidbodyType2D.Static;
+                    GetComponent<Collider2D>().enabled = false;
+
+                    Debug.Log($"{name} Died!");
+                    Destroy(gameObject);
+                }
             }
         }
         public int MaxHealth { get { return maxHealth; } }
@@ -104,7 +122,7 @@ namespace CompanionManager
             } 
         }
         public bool CanJump { get { return canJump; } private set { canJump = value; } }
-        public bool CanFallowPlayer { get { return canFallowPlayer; } }
+        public bool CanFollowPlayer { get { return canFollowPlayer; } }
         public bool IsGrounded 
         { 
             get { return isGrounded; } 
@@ -122,6 +140,8 @@ namespace CompanionManager
         public float AttackResetTime { get { return attackResetTime; } }
         public float RangeOfAttack { get { return rangeOfAttack; } set { rangeOfAttack = value; } }
         public LayerMask TargetLayer { get { return targetLayer; } }
+        public Image HealthBar1 { get { return healthBar1; } }
+        public Image HealthBar2 { get { return healthBar2; } }
         public bool CanAttack 
         { 
             get { return canAttack; } 
@@ -130,15 +150,21 @@ namespace CompanionManager
                 if (value == false) { IsAttacking = false; }
 
                 canAttack = value; 
-            } 
+            }
+        }
+
+        public bool CanTakeDamage
+        {
+            get { return canTakeDamage; }
+            set { canTakeDamage = value; }
         }
         public GameObject Target 
         { 
             get { return target; } 
             set 
             { 
-                if (value == null)  { canFallowPlayer = true; }
-                else                { canFallowPlayer = false; }
+                if (value == null)  { canFollowPlayer = true; }
+                else                { canFollowPlayer = false; }
 
                 target = value;
             } 

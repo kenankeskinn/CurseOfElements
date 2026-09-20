@@ -138,6 +138,24 @@ namespace PlayerManager
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""NextElement"",
+                    ""type"": ""Button"",
+                    ""id"": ""62cfe467-dd33-4d36-9c67-ea56a7ac98f3"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PreviousElement"",
+                    ""type"": ""Button"",
+                    ""id"": ""75182e9c-0fe8-4d5f-beb0-e236d5078f59"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -217,6 +235,28 @@ namespace PlayerManager
                     ""action"": ""RangedAttack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0ab09dbe-d8fc-4d73-a321-838f52bd7fb6"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""NextElement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e9bb8557-5402-489a-9cb5-67e5113b7674"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PreviousElement"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -230,6 +270,8 @@ namespace PlayerManager
             m_Gameplay_Interaction = m_Gameplay.FindAction("Interaction", throwIfNotFound: true);
             m_Gameplay_MeleeAttack = m_Gameplay.FindAction("MeleeAttack", throwIfNotFound: true);
             m_Gameplay_RangedAttack = m_Gameplay.FindAction("RangedAttack", throwIfNotFound: true);
+            m_Gameplay_NextElement = m_Gameplay.FindAction("NextElement", throwIfNotFound: true);
+            m_Gameplay_PreviousElement = m_Gameplay.FindAction("PreviousElement", throwIfNotFound: true);
         }
 
         ~@InputEvents()
@@ -315,6 +357,8 @@ namespace PlayerManager
         private readonly InputAction m_Gameplay_Interaction;
         private readonly InputAction m_Gameplay_MeleeAttack;
         private readonly InputAction m_Gameplay_RangedAttack;
+        private readonly InputAction m_Gameplay_NextElement;
+        private readonly InputAction m_Gameplay_PreviousElement;
         /// <summary>
         /// Provides access to input actions defined in input action map "Gameplay".
         /// </summary>
@@ -346,6 +390,14 @@ namespace PlayerManager
             /// Provides access to the underlying input action "Gameplay/RangedAttack".
             /// </summary>
             public InputAction @RangedAttack => m_Wrapper.m_Gameplay_RangedAttack;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/NextElement".
+            /// </summary>
+            public InputAction @NextElement => m_Wrapper.m_Gameplay_NextElement;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/PreviousElement".
+            /// </summary>
+            public InputAction @PreviousElement => m_Wrapper.m_Gameplay_PreviousElement;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -387,6 +439,12 @@ namespace PlayerManager
                 @RangedAttack.started += instance.OnRangedAttack;
                 @RangedAttack.performed += instance.OnRangedAttack;
                 @RangedAttack.canceled += instance.OnRangedAttack;
+                @NextElement.started += instance.OnNextElement;
+                @NextElement.performed += instance.OnNextElement;
+                @NextElement.canceled += instance.OnNextElement;
+                @PreviousElement.started += instance.OnPreviousElement;
+                @PreviousElement.performed += instance.OnPreviousElement;
+                @PreviousElement.canceled += instance.OnPreviousElement;
             }
 
             /// <summary>
@@ -413,6 +471,12 @@ namespace PlayerManager
                 @RangedAttack.started -= instance.OnRangedAttack;
                 @RangedAttack.performed -= instance.OnRangedAttack;
                 @RangedAttack.canceled -= instance.OnRangedAttack;
+                @NextElement.started -= instance.OnNextElement;
+                @NextElement.performed -= instance.OnNextElement;
+                @NextElement.canceled -= instance.OnNextElement;
+                @PreviousElement.started -= instance.OnPreviousElement;
+                @PreviousElement.performed -= instance.OnPreviousElement;
+                @PreviousElement.canceled -= instance.OnPreviousElement;
             }
 
             /// <summary>
@@ -488,6 +552,20 @@ namespace PlayerManager
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnRangedAttack(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "NextElement" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnNextElement(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "PreviousElement" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnPreviousElement(InputAction.CallbackContext context);
         }
     }
 }

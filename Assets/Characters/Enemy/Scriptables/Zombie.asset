@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Zombie
   m_EditorClassIdentifier: Assembly-CSharp::EnemyManager.EnemyScriptable
   enemyType: 0
-  maxHealth: 20
+  maxHealth: 63
   walkSpeed: 1
+  healReward: 5
   attackDamage: 10
   rangeOfView: 8
   rangeOfAttack: 1.25
@@ -22,3 +23,6 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 128
+  attackableCharacterLayers:
+    serializedVersion: 2
+    m_Bits: 384
