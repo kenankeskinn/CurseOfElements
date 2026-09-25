@@ -24,6 +24,7 @@ namespace CompanionManager
         [Header("Settings")]
         [SerializeField][Range(1, 5)] float walkSpeed = 1.5f;
         [SerializeField][Range(1, 5)] float jumpForce = 4;
+        [SerializeField][Range(10, 60)] int slopeLimit = 46;
         [SerializeField][Range(1, 5)] float minFollowDistance = 2.5f;
         [SerializeField] LayerMask jumpOnObjectsLayer;
 
@@ -109,6 +110,7 @@ namespace CompanionManager
         // Movement
         public float WalkSpeed { get { return walkSpeed; } }
         public float JumpForce { get { return jumpForce; } }
+        public int SlopeLimit { get { return slopeLimit; } }
         public float MinFollowDistance { get { return minFollowDistance; } }
         public LayerMask JumpOnObjectsLayer { get { return jumpOnObjectsLayer; } }
         public bool CanWalk 
@@ -188,7 +190,7 @@ namespace CompanionManager
 
             rb = GetComponent<Rigidbody2D>();
             currentHealth = maxHealth;
-            jumpOnObjectsLayer = ~LayerMask.GetMask("Companion", "Player", "Ground", "Enemy"); // Interactable
+            jumpOnObjectsLayer = ~LayerMask.GetMask("Companion", "Player", "Ground", "Enemy"); // Interactable / None
             targetLayer = LayerMask.GetMask("Enemy");
             playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
         }

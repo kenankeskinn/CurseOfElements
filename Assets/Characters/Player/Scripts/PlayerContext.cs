@@ -47,6 +47,7 @@ namespace PlayerManager
         [Header("Settings")]
         [SerializeField][Range(1, 10)] int walkSpeed = 3;
         [SerializeField][Range(1, 5)] int jumpForce = 4;
+        [SerializeField][Range(10, 60)] int slopeLimit = 45;
 
         [Header("Gameplay Info")]
         [SerializeField] bool canWalk = true;
@@ -145,6 +146,7 @@ namespace PlayerManager
         // Movement
         public int WalkSpeed { get { return walkSpeed; } }
         public int JumpForce { get { return jumpForce; } }
+        public int SlopeLimit { get { return slopeLimit; } }
         public bool CanWalk { get { return canWalk; } set { canWalk = value; } }
         public bool CanJump { get { return canJump; } set { canJump = value; } }
         public bool IsGrounded { get { return isGrounded; } set { isGrounded = value; } }

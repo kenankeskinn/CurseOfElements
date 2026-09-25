@@ -7,6 +7,7 @@ namespace PlayerManager
     {
         LayerMask groundLayer;
         Vector2 rightFootPos, leftFootPos;
+        Vector2 slopeCastPos;
 
         #region Custom Functions
         void Walk()
@@ -58,6 +59,33 @@ namespace PlayerManager
 
             PlayerContext.Instance.IsGrounded = hitR.collider != null || hitL.collider != null;
         }
+
+        void SlopeCheck()
+        {
+            if (transform.localScale.x == 1)
+                slopeCastPos = new Vector2(transform.position.x + .5f, transform.position.y - .35f);
+            else
+                slopeCastPos = new Vector2(transform.position.x - .5f, transform.position.y - .35f);
+
+            RaycastHit2D slopeHit = Physics2D.Raycast(slopeCastPos, Vector2.down, .6f, groundLayer);
+            Debug.DrawRay(slopeCastPos, Vector2.down * .6f, Color.gold);
+
+            if (slopeHit.collider == null) return;
+
+            float currentSlopeAngle = Vector2.Angle(Vector2.up, slopeHit.normal);
+
+            if (currentSlopeAngle <= 0.1f)
+            {
+                transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, 0));
+                return;
+            }
+
+            if (currentSlopeAngle <= PlayerContext.Instance.SlopeLimit)
+            {
+                float targetAngel = transform.localScale.x == 1 ? currentSlopeAngle : -currentSlopeAngle;
+                transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, targetAngel));
+            }
+        }
         #endregion
 
         #region Unity Functions
@@ -73,6 +101,7 @@ namespace PlayerManager
             GroundCheck();
 
             Walk();
+            SlopeCheck();
             Jump();
         }
         #endregion
