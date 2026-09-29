@@ -1,4 +1,4 @@
-using System;
+using CompanionManager;
 using System.Collections;
 using UnityEngine;
 
@@ -83,7 +83,7 @@ namespace PlayerManager
             attackCoroutine = StartCoroutine(ResetAttack(attackType));
         }
 
-        public void TakeDamage(int damage, GameObject enemy)
+        public void TakeDamage(int damage, GameObject enemy = null)
         {
             if (!PlayerContext.Instance.CanTakeDamage) { return; }
 
@@ -91,8 +91,11 @@ namespace PlayerManager
             PlayerContext.Instance.HealthBar.fillAmount -= damage / (float)PlayerContext.Instance.MaxHealth;
             if (takeDamageCoroutine == null) takeDamageCoroutine = StartCoroutine(ResetTakeDamage());
 
+            // Check is Player Dead
+            if (PlayerContext.Instance.IsDead) { return; }
+
             // Send message to companion
-            if (companionCombatController != null)
+            if (companionCombatController != null && enemy != null)
                 companionCombatController.SetTarget(enemy);
             else
             {
@@ -202,15 +205,10 @@ namespace PlayerManager
 
         void Die()
         {
-            PlayerContext.Instance.CanWalk = false;
-            PlayerContext.Instance.CanJump = false;
-            PlayerContext.Instance.CanAttack = false;
-            PlayerContext.Instance.CanTakeDamage = false;
-            PlayerContext.Instance.Rigidbody.bodyType = RigidbodyType2D.Static;
-            GetComponent<Collider2D>().enabled = false;
+            GameManagement.GameManager.LevelFailed();
 
             Debug.Log($"{name} Died!");
-            Destroy(gameObject);
+            gameObject.SetActive(false);
         }
 
         // Support Functions
@@ -305,6 +303,13 @@ namespace PlayerManager
             bullet.localPosition = PlayerContext.Instance.BulletStartTransform.position;
             bullet.rotation = Quaternion.Euler(0, 0, 90 * lookDirection);
         }
+
+        public void ResetCombatCoroutines()
+        {
+            attackCoroutine = null;
+            takeDamageCoroutine = null;
+            changeElementCoroutine = null;
+        }
         #endregion
 
         #region Unity Functions
@@ -339,10 +344,37 @@ namespace PlayerManager
             {
                 EarnElement(Element.Wind);
             }
+
+            if (GUI.Button(new Rect(new Vector2(10, 750), new Vector2(200, 100)), "20 Damage To Player"))
+            {
+                TakeDamage(20);
+            }
+
+            if (GUI.Button(new Rect(new Vector2(250, 750), new Vector2(200, 100)), "20 Damage To Companion"))
+            {
+                companionCombatController.TakeDamage(20);
+            }
+
+            if (GUI.Button(new Rect(new Vector2(550, 750), new Vector2(150, 100)), "Earn White Key"))
+            {
+                PlayerContext.Instance.Key = InteractableManager.KeyType.White;
+            }
+
+            if (GUI.Button(new Rect(new Vector2(750, 750), new Vector2(150, 100)), "Earn Red Key"))
+            {
+                PlayerContext.Instance.Key = InteractableManager.KeyType.Red;
+            }
+
+            if (GUI.Button(new Rect(new Vector2(950, 750), new Vector2(150, 100)), "Earn Black Key"))
+            {
+                PlayerContext.Instance.Key = InteractableManager.KeyType.Black;
+            }
         }
 
         private void Update()
         {
+            if (PlayerContext.Instance.IsDead) { return; }
+
             Attack();
 
             if (PlayerContext.Instance.NextElementInput || PlayerContext.Instance.PreviousElementInput) ChangeElement();

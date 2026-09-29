@@ -79,15 +79,10 @@ namespace CompanionManager
 
                 if (currentHealth == 0)
                 {
-                    CanWalk = false;
-                    CanJump = false;
-                    CanAttack = false;
-                    CanTakeDamage = false;
-                    Rigidbody.bodyType = RigidbodyType2D.Static;
-                    GetComponent<Collider2D>().enabled = false;
+                    GameManagement.GameManager.LevelFailed();
 
                     Debug.Log($"{name} Died!");
-                    Destroy(gameObject);
+                    gameObject.SetActive(false);
                 }
             }
         }
@@ -116,15 +111,15 @@ namespace CompanionManager
         public bool CanWalk 
         { 
             get { return canWalk; }
-            private set
+            set
             {
                 if (value == false) { IsWalking = false; }
 
                 canWalk = value; 
             } 
         }
-        public bool CanJump { get { return canJump; } private set { canJump = value; } }
-        public bool CanFollowPlayer { get { return canFollowPlayer; } }
+        public bool CanJump { get { return canJump; } set { canJump = value; } }
+        public bool CanFollowPlayer { get { return canFollowPlayer; } set { canFollowPlayer = value; } }
         public bool IsGrounded 
         { 
             get { return isGrounded; } 
@@ -147,7 +142,7 @@ namespace CompanionManager
         public bool CanAttack 
         { 
             get { return canAttack; } 
-            private set 
+            set 
             { 
                 if (value == false) { IsAttacking = false; }
 
@@ -184,15 +179,39 @@ namespace CompanionManager
         #region Unity Functions
         private void Awake()
         {
-            if (Instance != null) { Destroy(this); return; }
+            if (Instance != null) { Destroy(gameObject); return; }
             Instance = this;
-            DontDestroyOnLoad(this);
+            DontDestroyOnLoad(gameObject);
 
             rb = GetComponent<Rigidbody2D>();
             currentHealth = maxHealth;
-            jumpOnObjectsLayer = ~LayerMask.GetMask("Companion", "Player", "Ground", "Enemy"); // Interactable / None
+            jumpOnObjectsLayer = ~LayerMask.GetMask("Companion", "Player", "Ground", "Enemy", "Checkpoint", "Interactable"); // None
             targetLayer = LayerMask.GetMask("Enemy");
             playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
+        }
+        #endregion
+
+        #region Custom Functions
+        public void StartCompanionSystem()
+        {
+            CurrentHealth = MaxHealth;
+            HealthBar1.fillAmount = 1;
+            HealthBar2.fillAmount = 1;
+
+            CanWalk = true;
+            CanJump = true;
+            CanAttack = true;
+            CanTakeDamage = true;
+
+            Rigidbody.bodyType = RigidbodyType2D.Dynamic;
+            Rigidbody.gravityScale = 2;
+
+            GetComponent<Collider2D>().enabled = true;
+            
+            GetComponent<AnimationController>().ResetAnimationStates();
+            GetComponent<CombatController>().ResetCombatCoroutines();
+
+            gameObject.SetActive(true);
         }
         #endregion
     }

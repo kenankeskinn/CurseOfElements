@@ -1,3 +1,4 @@
+using PlayerManager;
 using UnityEngine;
 
 namespace CompanionManager
@@ -22,6 +23,16 @@ namespace CompanionManager
             animator.SetBool(AttackHash,    CompanionContext.Instance.IsAttacking);
             animator.SetBool(HurtHash,      CompanionContext.Instance.IsTakingDamage);
             animator.SetBool(DeathHash,     CompanionContext.Instance.IsDead);
+        }
+
+        public void ResetAnimationStates()
+        {
+            CompanionContext.Instance.IsWalking = false;
+            CompanionContext.Instance.IsJumping = false;
+            CompanionContext.Instance.IsFalling = false;
+            CompanionContext.Instance.IsAttacking = false;
+            CompanionContext.Instance.IsTakingDamage = false;
+            CompanionContext.Instance.IsDead = false;
         }
         #endregion
 

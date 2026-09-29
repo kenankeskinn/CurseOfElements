@@ -282,7 +282,6 @@ GameObject:
   - component: {fileID: 164710027}
   - component: {fileID: 164710029}
   - component: {fileID: 164710028}
-  - component: {fileID: 164710030}
   m_Layer: 6
   m_Name: InteractableObject1
   m_TagString: Untagged
@@ -410,18 +409,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &164710030
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 164710026}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46450f1e719b53f45ac59b883b8f0da0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InteractableController
 --- !u!1 &220549046
 GameObject:
   m_ObjectHideFlags: 0
@@ -1251,6 +1238,7 @@ MonoBehaviour:
   playerTransform: {fileID: 0}
   walkSpeed: 2.35
   jumpForce: 3
+  slopeLimit: 46
   minFollowDistance: 2.5
   jumpOnObjectsLayer:
     serializedVersion: 2
@@ -1533,6 +1521,7 @@ MonoBehaviour:
   maxHealth: 500
   walkSpeed: 3
   jumpForce: 4
+  slopeLimit: 45
   canWalk: 1
   canJump: 1
   isGrounded: 0
@@ -1566,6 +1555,7 @@ MonoBehaviour:
   isRangedAttacking: 0
   isTakingDamage: 0
   isDead: 0
+  ui: {fileID: 0}
   healthBar: {fileID: 1398174170}
   fireImage: {fileID: 1944107983}
   waterImage: {fileID: 280466110}
@@ -1940,7 +1930,6 @@ GameObject:
   - component: {fileID: 1523164452}
   - component: {fileID: 1523164455}
   - component: {fileID: 1523164454}
-  - component: {fileID: 1523164453}
   m_Layer: 6
   m_Name: InteractableObject1 (2)
   m_TagString: Untagged
@@ -1963,18 +1952,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1131290014}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1523164453
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1523164451}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46450f1e719b53f45ac59b883b8f0da0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InteractableController
 --- !u!61 &1523164454
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2091,7 +2068,6 @@ GameObject:
   - component: {fileID: 1712785507}
   - component: {fileID: 1712785510}
   - component: {fileID: 1712785509}
-  - component: {fileID: 1712785508}
   m_Layer: 6
   m_Name: InteractableObject1 (1)
   m_TagString: Untagged
@@ -2114,18 +2090,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1131290014}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1712785508
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1712785506}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46450f1e719b53f45ac59b883b8f0da0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InteractableController
 --- !u!61 &1712785509
 BoxCollider2D:
   m_ObjectHideFlags: 0

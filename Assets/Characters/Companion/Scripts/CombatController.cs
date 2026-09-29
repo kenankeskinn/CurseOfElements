@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 namespace CompanionManager
 {
@@ -28,7 +27,7 @@ namespace CompanionManager
             if (resetAttackCoroutine == null) resetAttackCoroutine = StartCoroutine(ResetAttack(target));
         }
 
-        public void TakeDamage(int amount, GameObject target)
+        public void TakeDamage(int amount, GameObject target = null)
         {
             if (!CompanionContext.Instance.CanTakeDamage) { return; }
 
@@ -37,7 +36,7 @@ namespace CompanionManager
             CompanionContext.Instance.HealthBar2.fillAmount -= amount / (float)CompanionContext.Instance.MaxHealth;
             StartCoroutine(ResetTakeDamage());
 
-            SetTarget(target);
+            if (target != null) SetTarget(target);
         }
 
         public void Heal(int amount)
@@ -94,6 +93,12 @@ namespace CompanionManager
             CompanionContext.Instance.IsTakingDamage = true;
             yield return new WaitForSeconds(.333f);
             CompanionContext.Instance.IsTakingDamage = false;
+        }
+
+        public void ResetCombatCoroutines()
+        {
+            releaseAttackCoroutine = null;
+            resetAttackCoroutine = null;
         }
         #endregion
 

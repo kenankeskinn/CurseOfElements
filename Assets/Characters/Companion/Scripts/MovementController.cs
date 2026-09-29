@@ -122,6 +122,8 @@ namespace CompanionManager
 
         private void Update()
         {
+            if (CompanionContext.Instance.IsDead) { return; }
+
             FollowPlayer();
             SlopeCheck();
         }

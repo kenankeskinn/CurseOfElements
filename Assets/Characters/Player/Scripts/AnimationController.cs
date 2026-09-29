@@ -30,6 +30,18 @@ namespace PlayerManager
             animator.SetBool(DamageHash, PlayerContext.Instance.IsTakingDamage);
             animator.SetBool(DeadHash, PlayerContext.Instance.IsDead);
         }
+
+        public void ResetAnimationStates()
+        {
+            PlayerContext.Instance.IsWalking = false;
+            PlayerContext.Instance.IsJumping = false;
+            PlayerContext.Instance.IsFalling = false;
+            PlayerContext.Instance.IsInteracting = false;
+            PlayerContext.Instance.IsMeleeAttacking = false;
+            PlayerContext.Instance.IsRangedAttacking = false;
+            PlayerContext.Instance.IsTakingDamage = false;
+            PlayerContext.Instance.IsDead = false;
+        }
         #endregion
 
         #region Unity Functions

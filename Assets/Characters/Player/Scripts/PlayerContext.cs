@@ -89,6 +89,7 @@ namespace PlayerManager
         [Header("-- INTERACTION --")]
         [Header("Gameplay Info")]
         [SerializeField] bool canInteract = true;
+        [SerializeField] InteractableManager.KeyType key = InteractableManager.KeyType.None;
 
         [Header("Input Info")]
         [SerializeField] bool interactionInput = false;
@@ -109,6 +110,10 @@ namespace PlayerManager
         [Space(20)]
 
         [Header("-- UI OPERATIONS --")]
+        [Header("GameObject")]
+        [SerializeField] GameObject ui;
+        [SerializeField] GameObject[] keysUI = new GameObject[3];
+
         [Header("Image")]
         [SerializeField] Image healthBar;
         [SerializeField] Image fireImage;
@@ -123,6 +128,9 @@ namespace PlayerManager
         [Header("Color")]
         [SerializeField] Color unUsedElement;
         [SerializeField] Color usedElement;
+
+        [Header("Text")]
+        [SerializeField] TMPro.TextMeshProUGUI interactionText;
         #endregion
 
         #region Properties
@@ -218,6 +226,47 @@ namespace PlayerManager
 
         // Interaction
         public bool InteractionInput { get { return interactionInput; } }
+        public InteractableManager.KeyType Key 
+        { 
+            get { return key; } 
+            set  
+            { 
+                key = value;
+
+                // keysUI[0] = White Key UI
+                // keysUI[1] = Red Key UI
+                // keysUI[2] = Black Key UI
+                switch (key)
+                {
+                    case InteractableManager.KeyType.None:
+                        keysUI[0].SetActive(false);
+                        keysUI[1].SetActive(false);
+                        keysUI[2].SetActive(false);
+                        break;
+                    case InteractableManager.KeyType.White:
+                        keysUI[0].SetActive(true);
+                        keysUI[1].SetActive(false);
+                        keysUI[2].SetActive(false);
+
+                        keysUI[0].GetComponent<Animator>().Play(Animator.StringToHash("EarnKey"));
+                        break;
+                    case InteractableManager.KeyType.Red:
+                        keysUI[0].SetActive(false);
+                        keysUI[1].SetActive(true);
+                        keysUI[2].SetActive(false);
+
+                        keysUI[1].GetComponent<Animator>().Play(Animator.StringToHash("EarnKey"));
+                        break;
+                    case InteractableManager.KeyType.Black:
+                        keysUI[0].SetActive(false);
+                        keysUI[1].SetActive(false);
+                        keysUI[2].SetActive(true);
+
+                        keysUI[2].GetComponent<Animator>().Play(Animator.StringToHash("EarnKey"));
+                        break;
+                }
+            } 
+        }
 
         // Animation
         public bool IsWalking { get { return isWalking; } set { isWalking = value; } }
@@ -230,6 +279,7 @@ namespace PlayerManager
         public bool IsDead { get { return isDead; } set { isDead = value; } }
 
         // UI Operations
+        public GameObject UI { get { return ui; } }
         public Image HealthBar { get { return healthBar; } }
         public Image FireImage { get { return fireImage; } }
         public Image WaterImage { get { return waterImage; } }
@@ -239,14 +289,17 @@ namespace PlayerManager
         public Animator WindAnimator { get { return windAnimator; } }
         public Color UnUsedElement { get { return unUsedElement; } }
         public Color UsedElement { get { return usedElement; } }
+        public TMPro.TextMeshProUGUI InteractionText { get { return interactionText; } }
         #endregion
 
         #region Unity Functions
         private void Awake()
         {
-            if (Instance != null) { Destroy(this); return; }
+            if (Instance != null) { Destroy(gameObject); return; }
             Instance = this;
-            DontDestroyOnLoad(this);
+            DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(UI);
+            UI.SetActive(true);
 
             inputs = new InputEvents();
             rb = GetComponent<Rigidbody2D>();
@@ -271,11 +324,34 @@ namespace PlayerManager
 
         private void OnEnable()
         {
-            Inputs.Enable();
+            if (Inputs != null) Inputs.Enable();
         }
         private void OnDisable()
         {
-            Inputs.Disable();
+            if (Inputs != null) Inputs.Disable();
+        }
+        #endregion
+
+        #region Custom Functions
+        public void StartPlayerSystem()
+        {
+            CurrentHealth = MaxHealth;
+            HealthBar.fillAmount = 1;
+
+            CanWalk = true;
+            CanJump = true;
+            CanAttack = true;
+            CanTakeDamage = true;
+
+            Rigidbody.bodyType = RigidbodyType2D.Dynamic;
+            Rigidbody.gravityScale = 2;
+
+            GetComponent<Collider2D>().enabled = true;
+
+            GetComponent<AnimationController>().ResetAnimationStates();
+            GetComponent<CombatController>().ResetCombatCoroutines();
+
+            gameObject.SetActive(true);
         }
         #endregion
     }
